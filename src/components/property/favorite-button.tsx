@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
@@ -114,16 +115,18 @@ export function FavoriteButton({ propertyId, className = '' }: FavoriteButtonPro
 
   return (
     <Button
-      variant={isFavorite ? "default" : "outline"}
-      size="sm"
-      className={`absolute top-4 right-4 bg-white/90 hover:bg-white transition-all duration-200 shadow-md font-medium ${
-        isFavorite ? 'bg-red-500 text-white hover:bg-red-600 border-red-500' : 'text-gray-700 hover:text-gray-900'
-      } ${className}`}
+      variant="ghost"
+      size="icon"
+      className={`absolute top-4 right-4 bg-white/90 hover:bg-white hover:scale-110 transition-all duration-200 shadow-md ${className}`}
       onClick={toggleFavorite}
       disabled={isLoading}
       data-testid={`button-favorite-${propertyId}`}
     >
-      {isFavorite ? 'Favori' : 'Favoris'}
+      <Heart
+        className={`h-5 w-5 transition-colors ${
+          isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-700'
+        }`}
+      />
     </Button>
   );
 }

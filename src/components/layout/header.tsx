@@ -108,22 +108,22 @@ export default function Header() {
               <Link href="/favorites">
                 <Button 
                   variant="ghost" 
-                  size="icon" 
+                  size="sm" 
                   className="text-gray-700 hover:text-primary"
                   data-testid="button-favorites"
                 >
-                  <Heart className="h-5 w-5" />
+                  Favoris
                 </Button>
               </Link>
             ) : (
               <Button 
                 variant="ghost" 
-                size="icon" 
+                size="sm" 
                 className="text-gray-700 hover:text-primary"
                 onClick={handleGuestFavoriteClick}
                 data-testid="button-favorites"
               >
-                <Heart className="h-5 w-5" />
+                Favoris
               </Button>
             )}
             
@@ -259,13 +259,15 @@ export default function Header() {
               <div className="pt-4 border-t border-gray-200 space-y-3">
                 {user ? (
                   <>
-                    <div className="flex items-center gap-2 pb-2">
-                      <Link href="/favorites" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="ghost" size="icon" className="text-gray-700">
-                          <Heart className="h-5 w-5" />
-                        </Button>
-                      </Link>
-                    </div>
+                    <Link href="/favorites" onClick={() => setIsMenuOpen(false)}>
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start"
+                        data-testid="mobile-button-favorites"
+                      >
+                        Favoris
+                      </Button>
+                    </Link>
                     
                     {user.role === 'admin' && (
                       <Link href="/admin/dashboard" onClick={() => setIsMenuOpen(false)}>
@@ -318,17 +320,14 @@ export default function Header() {
                   </>
                 ) : (
                   <>
-                    <div className="flex items-center gap-2 pb-2">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-gray-700"
-                        onClick={handleGuestFavoriteClick}
-                        data-testid="mobile-button-favorites"
-                      >
-                        <Heart className="h-5 w-5" />
-                      </Button>
-                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={handleGuestFavoriteClick}
+                      data-testid="mobile-button-favorites"
+                    >
+                      Favoris
+                    </Button>
                     
                     <Link href="/login" onClick={() => setIsMenuOpen(false)}>
                       <Button 

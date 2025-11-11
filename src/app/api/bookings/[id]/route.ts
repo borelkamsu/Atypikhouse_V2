@@ -43,7 +43,7 @@ export async function GET(
   }
 }
 
-// PATCH /api/bookings/[id]/cancel - Annuler une réservation
+// PATCH /api/bookings/[id] - Mettre à jour le statut d'une réservation
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -56,6 +56,13 @@ export async function PATCH(
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }
 
+    const body = await request.json();
+    const { status } = body;
+
+    if (!status || !['confirmed', 'cancelled', 'completed'].includes(status)) {
+      return NextResponse.json({ message: 'Statut invalide' }, { status: 400 });
+    }
+
     const booking = await Booking.findById(params.id)
       .populate('propertyId', 'ownerId');
 
@@ -66,28 +73,53 @@ export async function PATCH(
     // Vérifier les permissions
     const bookingUserId = booking.userId.toString();
     const propertyOwnerId = booking.propertyId?.ownerId?.toString();
+    const isOwner = propertyOwnerId === token.userId;
+    const isClient = bookingUserId === token.userId;
+    const isAdmin = token.role === 'admin';
     
-    if (bookingUserId !== token.userId && propertyOwnerId !== token.userId && token.role !== 'admin') {
-      return NextResponse.json({ message: 'Vous n\'avez pas la permission d\'annuler cette réservation' }, { status: 403 });
+    if (!isOwner && !isClient && !isAdmin) {
+      return NextResponse.json({ message: 'Vous n\'avez pas la permission de modifier cette réservation' }, { status: 403 });
     }
 
-    // Vérifier que la réservation peut être annulée
-    const now = new Date();
-    const startDate = new Date(booking.startDate);
-    
-    if (startDate <= now) {
-      return NextResponse.json({ message: 'Impossible d\'annuler une réservation qui a déjà commencé' }, { status: 400 });
+    // Règles de validation selon le statut demandé
+    if (status === 'confirmed') {
+      // Seul le propriétaire ou l'admin peut confirmer
+      if (!isOwner && !isAdmin) {
+        return NextResponse.json({ message: 'Seul le propriétaire peut confirmer une réservation' }, { status: 403 });
+      }
+      // On peut seulement confirmer une réservation en attente
+      if (booking.status !== 'pending') {
+        return NextResponse.json({ message: 'Seules les réservations en attente peuvent être confirmées' }, { status: 400 });
+      }
     }
 
-    // Annuler la réservation
-    booking.status = 'cancelled';
+    if (status === 'cancelled') {
+      // Le client, le propriétaire ou l'admin peuvent annuler
+      // Vérifier que la réservation n'a pas déjà commencé
+      const now = new Date();
+      const startDate = new Date(booking.startDate);
+      
+      if (startDate <= now && !isAdmin) {
+        return NextResponse.json({ message: 'Impossible d\'annuler une réservation qui a déjà commencé' }, { status: 400 });
+      }
+    }
+
+    if (status === 'completed') {
+      // Seul le propriétaire ou l'admin peut marquer comme terminée
+      if (!isOwner && !isAdmin) {
+        return NextResponse.json({ message: 'Seul le propriétaire peut marquer une réservation comme terminée' }, { status: 403 });
+      }
+    }
+
+    // Mettre à jour le statut
+    booking.status = status;
     await booking.save();
 
     return NextResponse.json(booking);
   } catch (error) {
-    console.error('Erreur lors de l\'annulation de la réservation:', error);
+    console.error('Erreur lors de la mise à jour de la réservation:', error);
     return NextResponse.json(
-      { message: 'Erreur lors de l\'annulation de la réservation' },
+      { message: 'Erreur lors de la mise à jour de la réservation' },
       { status: 500 }
     );
   }
@@ -121,5 +153,4 @@ export async function DELETE(
     );
   }
 }
-
 

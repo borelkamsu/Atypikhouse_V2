@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import dbConnect from '@/lib/db/mongodb';
 import { Amenity } from '@/models/amenity';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyTokenFromRequest } from '@/lib/auth/jwt';
 
 // Schéma de validation pour créer une amenity
 const createAmenitySchema = z.object({
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token || token.role !== 'admin') {
       return NextResponse.json({ message: 'Accès administrateur requis' }, { status: 403 });
     }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db/mongodb';
 import { User } from '@/models/user';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyTokenFromRequest } from '@/lib/auth/jwt';
 
 // POST /api/admin/hosts/[id]/reject - Rejeter un hôte
 export async function POST(
@@ -11,7 +11,7 @@ export async function POST(
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token || token.role !== 'admin') {
       return NextResponse.json({ message: 'Accès administrateur requis' }, { status: 403 });
     }

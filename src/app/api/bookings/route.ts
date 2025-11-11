@@ -3,7 +3,7 @@ import { z } from 'zod';
 import dbConnect from '@/lib/db/mongodb';
 import { Booking } from '@/models/booking';
 import { Property } from '@/models/property';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyTokenFromRequest } from '@/lib/auth/jwt';
 
 // Schéma de validation pour créer une réservation
 const createBookingSchema = z.object({
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }

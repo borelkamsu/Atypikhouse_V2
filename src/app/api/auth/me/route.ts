@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyTokenFromRequest } from '@/lib/auth/jwt';
 import dbConnect from '@/lib/db/mongodb';
 import { User } from '@/models/user';
 
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }

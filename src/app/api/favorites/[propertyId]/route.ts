@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db/mongodb';
 import { Favorite } from '@/models/favorite';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyTokenFromRequest } from '@/lib/auth/jwt';
 
 // DELETE /api/favorites/[propertyId] - Supprimer un favori
 export async function DELETE(
@@ -11,7 +11,7 @@ export async function DELETE(
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }
@@ -43,7 +43,7 @@ export async function GET(
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }

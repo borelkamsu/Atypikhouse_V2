@@ -37,3 +37,20 @@ export function getTokenFromCookie(req: NextRequest): string | null {
 }
 
 
+
+// Helper function to verify token from NextRequest
+export function verifyTokenFromRequest(req: NextRequest): JWTPayload | null {
+  // Try to get token from cookie first
+  let token = getTokenFromCookie(req);
+  
+  // If no cookie token, try Authorization header
+  if (!token) {
+    token = getTokenFromRequest(req);
+  }
+  
+  if (!token) {
+    return null;
+  }
+  
+  return verifyToken(token);
+}

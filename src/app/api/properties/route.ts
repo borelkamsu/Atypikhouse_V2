@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db/mongodb';
 import { Property } from '@/models/property';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyTokenFromRequest } from '@/lib/auth/jwt';
 
 export async function GET(request: NextRequest) {
   try {
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Récupérer l'utilisateur connecté depuis le token
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db/mongodb';
 import { Property } from '@/models/property';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyTokenFromRequest } from '@/lib/auth/jwt';
 
 // GET /api/properties/:id - Récupérer une propriété spécifique
 export async function GET(
@@ -40,7 +40,7 @@ export async function PUT(
   try {
     await dbConnect();
 
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }
@@ -103,7 +103,7 @@ export async function DELETE(
   try {
     await dbConnect();
 
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }

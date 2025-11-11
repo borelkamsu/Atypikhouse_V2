@@ -356,12 +356,12 @@ export default function PropertyDetailPage() {
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
                     <span className="text-lg font-medium">
-                      {property.owner.firstName[0]}{property.owner.lastName[0]}
+                      {property.owner?.firstName?.[0]}{property.owner?.lastName?.[0]}
                     </span>
                   </div>
                   <div>
                     <p className="font-medium">
-                      {property.owner.firstName} {property.owner.lastName}
+                      {property.owner?.firstName} {property.owner?.lastName}
                     </p>
                     <p className="text-sm text-gray-600">Propriétaire</p>
                   </div>

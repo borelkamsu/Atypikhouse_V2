@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db/mongodb';
 import { User } from '@/models/user';
 import { Property } from '@/models/property';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyTokenFromRequest } from '@/lib/auth/jwt';
 
 // GET /api/admin/owners - Récupérer tous les propriétaires avec statistiques
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token || token.role !== 'admin') {
       return NextResponse.json({ message: 'Accès administrateur requis' }, { status: 403 });
     }

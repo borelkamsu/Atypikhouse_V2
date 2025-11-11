@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db/mongodb';
 import { Booking } from '@/models/booking';
 import { Property } from '@/models/property';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyTokenFromRequest } from '@/lib/auth/jwt';
 
 // GET /api/bookings/[id] - Récupérer une réservation spécifique
 export async function GET(
@@ -12,7 +12,7 @@ export async function GET(
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }
@@ -51,7 +51,7 @@ export async function PATCH(
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token) {
       return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
     }
@@ -101,7 +101,7 @@ export async function DELETE(
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token || token.role !== 'admin') {
       return NextResponse.json({ message: 'Accès administrateur requis' }, { status: 403 });
     }

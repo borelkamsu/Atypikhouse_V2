@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import dbConnect from '@/lib/db/mongodb';
 import { User } from '@/models/user';
-import { verifyToken } from '@/lib/auth/jwt';
+import { verifyTokenFromRequest } from '@/lib/auth/jwt';
 
 // Schéma de validation pour mettre à jour un utilisateur
 const updateUserSchema = z.object({
@@ -19,7 +19,7 @@ export async function GET(
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token || token.role !== 'admin') {
       return NextResponse.json({ message: 'Accès administrateur requis' }, { status: 403 });
     }
@@ -48,7 +48,7 @@ export async function PATCH(
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token || token.role !== 'admin') {
       return NextResponse.json({ message: 'Accès administrateur requis' }, { status: 403 });
     }
@@ -91,7 +91,7 @@ export async function DELETE(
   try {
     await dbConnect();
     
-    const token = await verifyToken(request);
+    const token = verifyTokenFromRequest(request);
     if (!token || token.role !== 'admin') {
       return NextResponse.json({ message: 'Accès administrateur requis' }, { status: 403 });
     }

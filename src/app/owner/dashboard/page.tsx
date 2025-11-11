@@ -1,213 +1,48 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  Plus, 
-  Home, 
-  Calendar, 
-  Euro, 
-  Users, 
-  Star, 
-  Clock, 
-  CheckCircle, 
+import {
+  Plus,
+  Home,
+  Calendar,
+  Euro,
+  Users,
+  Star,
+  Clock,
+  CheckCircle,
   XCircle,
   AlertCircle,
   Building,
   Pencil
 } from 'lucide-react';
+import { verifyToken } from '@/lib/auth/jwt';
+import { getOwnerProperties, getOwnerBookings, calculateOwnerStats } from '@/lib/server/owner-data';
 import { DeletePropertyForm } from '@/components/owner/delete-property-form';
+import { BookingActions } from '@/components/owner/booking-actions';
 
-interface Property {
-  _id: string;
-  title: string;
-  type: string;
-  location: {
-    city: string;
-    country: string;
-  };
-  price: {
-    perNight: number;
-    currency: string;
-  };
-  capacity: {
-    guests: number;
-  };
-  images: Array<{ url: string; publicId: string }>;
-  rating: number;
-  isAvailable: boolean;
-  createdAt: string;
-}
+export default async function OwnerDashboard() {
+  // Vérifier l'authentification
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
 
-interface Booking {
-  _id: string;
-  propertyId: {
-    _id: string;
-    title: string;
-  };
-  userId: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  startDate: string;
-  endDate: string;
-  totalPrice: number;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  guests: number;
-  createdAt: string;
-}
+  if (!token) {
+    redirect('/login');
+  }
 
-interface OwnerStats {
-  totalProperties: number;
-  totalBookings: number;
-  pendingBookings: number;
-  totalRevenue: number;
-  averageRating: number;
-}
+  let decoded;
+  try {
+    decoded = verifyToken(token);
+  } catch (error) {
+    redirect('/login');
+  }
 
-export default function OwnerDashboard() {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [stats, setStats] = useState<OwnerStats>({
-    totalProperties: 0,
-    totalBookings: 0,
-    pendingBookings: 0,
-    totalRevenue: 0,
-    averageRating: 0
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
-    try {
-      let propertiesArray: Property[] = [];
-      let bookingsArray: Booking[] = [];
-      
-      // Récupérer les propriétés du propriétaire
-      const propertiesResponse = await fetch('/api/properties?owner=true');
-      if (propertiesResponse.ok) {
-        const propertiesData = await propertiesResponse.json();
-        // L'API retourne {properties: [...], pagination: {...}}
-        propertiesArray = propertiesData.properties || [];
-        setProperties(propertiesArray);
-      }
-
-      // Récupérer les réservations
-      const bookingsResponse = await fetch('/api/bookings?owner=true');
-      if (bookingsResponse.ok) {
-        const bookingsData = await bookingsResponse.json();
-        // L'API bookings retourne un tableau direct (pas une structure avec pagination)
-        bookingsArray = Array.isArray(bookingsData) ? bookingsData : [];
-        setBookings(bookingsArray);
-      }
-
-      // Calculer les statistiques
-      calculateStats(propertiesArray, bookingsArray);
-
-    } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: 'Erreur lors du chargement du tableau de bord',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const calculateStats = (propertiesData: Property[], bookingsData: Booking[]) => {
-    const totalProperties = propertiesData.length;
-    const totalBookings = bookingsData.length;
-    const pendingBookings = bookingsData.filter(b => b.status === 'pending').length;
-    const totalRevenue = bookingsData
-      .filter(b => b.status === 'confirmed' || b.status === 'completed')
-      .reduce((sum, b) => sum + b.totalPrice, 0);
-    const averageRating = propertiesData.length > 0 
-      ? propertiesData.reduce((sum, p) => sum + p.rating, 0) / propertiesData.length 
-      : 0;
-
-    setStats({
-      totalProperties,
-      totalBookings,
-      pendingBookings,
-      totalRevenue,
-      averageRating
-    });
-  };
-
-  const handleBookingAction = async (bookingId: string, action: 'confirm' | 'reject') => {
-    try {
-      const response = await fetch(`/api/bookings/${bookingId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          status: action === 'confirm' ? 'confirmed' : 'cancelled' 
-        }),
-      });
-
-      if (response.ok) {
-        toast({
-          title: action === 'confirm' ? 'Réservation confirmée' : 'Réservation rejetée',
-          description: `La réservation a été ${action === 'confirm' ? 'confirmée' : 'rejetée'} avec succès.`,
-        });
-        fetchDashboardData();
-      } else {
-        toast({
-          title: 'Erreur',
-          description: 'Impossible de traiter la réservation',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleDeleteProperty = async (propertyId: string, propertyTitle: string) => {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer "${propertyTitle}" ? Cette action est irréversible.`)) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/properties/${propertyId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Erreur lors de la suppression');
-      }
-
-      toast({
-        title: 'Succès',
-        description: 'Propriété supprimée avec succès',
-      });
-
-      fetchDashboardData();
-    } catch (error: any) {
-      toast({
-        title: 'Erreur',
-        description: error.message || 'Erreur lors de la suppression de la propriété',
-        variant: 'destructive',
-      });
-    }
-  };
+  // Charger les données côté serveur
+  const properties = await getOwnerProperties(decoded.userId);
+  const bookings = await getOwnerBookings(decoded.userId);
+  const stats = await calculateOwnerStats(properties, bookings);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -247,17 +82,6 @@ export default function OwnerDashboard() {
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Chargement du tableau de bord...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
@@ -269,10 +93,12 @@ export default function OwnerDashboard() {
                 Gérez vos propriétés et réservations
               </p>
             </div>
-            <Button onClick={() => router.push('/owner/properties/new')}>
-              <Plus className="h-4 w-4 mr-2" />
-              Ajouter une propriété
-            </Button>
+            <Link href="/owner/properties/new">
+              <Button data-testid="button-add-property">
+                <Plus className="h-4 w-4 mr-2" />
+                Ajouter une propriété
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -361,9 +187,11 @@ export default function OwnerDashboard() {
                   <p className="text-gray-600 mb-4">
                     Commencez par ajouter votre première propriété.
                   </p>
-                  <Button onClick={() => router.push('/owner/properties/new')}>
-                    Ajouter une propriété
-                  </Button>
+                  <Link href="/owner/properties/new">
+                    <Button data-testid="button-add-first-property">
+                      Ajouter une propriété
+                    </Button>
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -394,29 +222,32 @@ export default function OwnerDashboard() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => router.push(`/owner/properties/${property._id}/edit`)}
-                          data-testid={`button-edit-${property._id}`}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <DeletePropertyForm 
-                          propertyId={property._id} 
-                          propertyTitle={property.title} 
+                        <Link href={`/owner/properties/${property._id}/edit`}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            data-testid={`button-edit-${property._id}`}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <DeletePropertyForm
+                          propertyId={property._id}
+                          propertyTitle={property.title}
                         />
                       </div>
                     </div>
                   ))}
                   {properties.length > 3 && (
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => router.push('/owner/properties')}
-                    >
-                      Voir toutes les propriétés ({properties.length})
-                    </Button>
+                    <Link href="/owner/properties">
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        data-testid="button-view-all-properties"
+                      >
+                        Voir toutes les propriétés ({properties.length})
+                      </Button>
+                    </Link>
                   )}
                 </div>
               )}
@@ -449,65 +280,33 @@ export default function OwnerDashboard() {
                 <div className="space-y-4">
                   {bookings.slice(0, 5).map((booking) => (
                     <div key={booking._id} className="p-4 border rounded-lg">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="font-medium text-gray-900">
-                            {booking.propertyId.title}
-                          </h4>
-                          <p className="text-sm text-gray-600">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            {getStatusIcon(booking.status)}
+                            <h4 className="font-medium text-gray-900">
+                              {booking.propertyId.title}
+                            </h4>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-1">
                             {booking.userId.firstName} {booking.userId.lastName}
                           </p>
+                          <p className="text-sm text-gray-500">
+                            Du {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {booking.guests} voyageurs • {booking.totalPrice}€
+                          </p>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {getStatusIcon(booking.status)}
+                        <div>
                           {getStatusBadge(booking.status)}
                         </div>
                       </div>
-                      
-                      <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
-                        <div>
-                          <span className="font-medium">Arrivée:</span> {formatDate(booking.startDate)}
-                        </div>
-                        <div>
-                          <span className="font-medium">Départ:</span> {formatDate(booking.endDate)}
-                        </div>
-                        <div>
-                          <span className="font-medium">Voyageurs:</span> {booking.guests}
-                        </div>
-                        <div>
-                          <span className="font-medium">Prix:</span> {booking.totalPrice}€
-                        </div>
-                      </div>
-
                       {booking.status === 'pending' && (
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => handleBookingAction(booking._id, 'confirm')}
-                          >
-                            Confirmer
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleBookingAction(booking._id, 'reject')}
-                          >
-                            Rejeter
-                          </Button>
-                        </div>
+                        <BookingActions bookingId={booking._id} />
                       )}
                     </div>
                   ))}
-                  
-                  {bookings.length > 5 && (
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => router.push('/owner/bookings')}
-                    >
-                      Voir toutes les réservations ({bookings.length})
-                    </Button>
-                  )}
                 </div>
               )}
             </CardContent>

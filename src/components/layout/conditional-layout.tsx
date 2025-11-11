@@ -12,22 +12,21 @@ interface ConditionalLayoutProps {
 export default function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const location = usePathname();
   
-  // Vérifier si on est sur une page admin
+  // Vérifier si on est sur une page admin (seulement admin n'a pas de header/footer)
   const isAdminPage = location.startsWith('/admin');
-  const isOwnerPage = location.startsWith('/owner');
   
   // Pages qui n'ont pas besoin du header/footer
   const noLayoutPages = ['/login', '/register'];
-  const needsLayout = !isAdminPage && !isOwnerPage && !noLayoutPages.includes(location);
+  const needsLayout = !isAdminPage && !noLayoutPages.includes(location);
   
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Afficher le header seulement pour les pages client */}
+      {/* Afficher le header pour toutes les pages sauf admin et login/register */}
       {needsLayout && <Header />}
       <main className="flex-grow">
         {children}
       </main>
-      {/* Afficher le footer seulement pour les pages client */}
+      {/* Afficher le footer pour toutes les pages sauf admin et login/register */}
       {needsLayout && <Footer />}
     </div>
   );

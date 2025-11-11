@@ -35,7 +35,7 @@ interface Category {
 async function getFeaturedProperties(): Promise<Property[]> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5000';
-    const res = await fetch(`${baseUrl}/api/properties/featured?limit=6`, {
+    const res = await fetch(`${baseUrl}/api/properties/featured?limit=3`, {
       cache: 'no-store' // Toujours récupérer les données fraîches
     });
     
@@ -180,7 +180,7 @@ export default async function Home() {
           </h2>
           {featuredProperties.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {featuredProperties.slice(0, 6).map((property) => (
+              {featuredProperties.slice(0, 3).map((property) => (
                 <Card 
                   key={property._id} 
                   className="group hover:shadow-xl transition-shadow border-gray-200 overflow-hidden"

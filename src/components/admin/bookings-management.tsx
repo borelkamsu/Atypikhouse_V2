@@ -11,17 +11,19 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Booking {
   _id: string;
-  user: {
+  userId: {
     _id: string;
     firstName: string;
     lastName: string;
     email: string;
   };
-  property: {
+  propertyId: {
     _id: string;
     title: string;
     location: {
       city: string;
+      country: string;
+      address: string;
     };
   };
   startDate: string;
@@ -186,9 +188,9 @@ export function BookingsManagement() {
                         <User className="h-4 w-4 text-gray-400" />
                         <div>
                           <p className="font-medium">
-                            {booking.user.firstName} {booking.user.lastName}
+                            {booking.userId.firstName} {booking.userId.lastName}
                           </p>
-                          <p className="text-sm text-gray-500">{booking.user.email}</p>
+                          <p className="text-sm text-gray-500">{booking.userId.email}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -196,8 +198,8 @@ export function BookingsManagement() {
                       <div className="flex items-center gap-2">
                         <Home className="h-4 w-4 text-gray-400" />
                         <div>
-                          <p className="font-medium">{booking.property.title}</p>
-                          <p className="text-sm text-gray-500">{booking.property.location.city}</p>
+                          <p className="font-medium">{booking.propertyId.title}</p>
+                          <p className="text-sm text-gray-500">{booking.propertyId.location.city}</p>
                         </div>
                       </div>
                     </TableCell>

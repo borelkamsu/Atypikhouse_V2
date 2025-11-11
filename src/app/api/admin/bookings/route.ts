@@ -23,11 +23,41 @@ export async function GET(request: NextRequest) {
     }
 
     const bookings = await Booking.find(query)
-      .populate('user', 'firstName lastName email')
-      .populate('property', 'title location.city')
+      .populate('userId', 'firstName lastName email')
+      .populate('propertyId', 'title location')
       .sort({ createdAt: -1 });
 
-    return NextResponse.json(bookings);
+    // Gérer les relations orphelines (user ou property supprimés)
+    const bookingsWithDefaults = bookings.map(booking => {
+      const bookingObj = booking.toObject();
+      
+      // Fournir un objet de repli si l'utilisateur n'existe pas
+      if (!bookingObj.userId) {
+        bookingObj.userId = {
+          _id: 'unknown',
+          firstName: 'Utilisateur',
+          lastName: 'supprimé',
+          email: 'N/A'
+        };
+      }
+      
+      // Fournir un objet de repli si la propriété n'existe pas
+      if (!bookingObj.propertyId) {
+        bookingObj.propertyId = {
+          _id: 'unknown',
+          title: 'Propriété supprimée',
+          location: {
+            city: 'N/A',
+            country: 'N/A',
+            address: 'N/A'
+          }
+        };
+      }
+      
+      return bookingObj;
+    });
+
+    return NextResponse.json(bookingsWithDefaults);
   } catch (error) {
     console.error('Erreur lors de la récupération des réservations:', error);
     return NextResponse.json(
@@ -58,14 +88,38 @@ export async function PATCH(request: NextRequest) {
       { status },
       { new: true }
     )
-      .populate('user', 'firstName lastName email')
-      .populate('property', 'title location.city');
+      .populate('userId', 'firstName lastName email')
+      .populate('propertyId', 'title location');
 
     if (!booking) {
       return NextResponse.json({ message: 'Réservation non trouvée' }, { status: 404 });
     }
 
-    return NextResponse.json(booking);
+    // Gérer les relations orphelines
+    const bookingObj = booking.toObject();
+    
+    if (!bookingObj.userId) {
+      bookingObj.userId = {
+        _id: 'unknown',
+        firstName: 'Utilisateur',
+        lastName: 'supprimé',
+        email: 'N/A'
+      };
+    }
+    
+    if (!bookingObj.propertyId) {
+      bookingObj.propertyId = {
+        _id: 'unknown',
+        title: 'Propriété supprimée',
+        location: {
+          city: 'N/A',
+          country: 'N/A',
+          address: 'N/A'
+        }
+      };
+    }
+
+    return NextResponse.json(bookingObj);
   } catch (error) {
     console.error('Erreur lors de la mise à jour de la réservation:', error);
     return NextResponse.json(

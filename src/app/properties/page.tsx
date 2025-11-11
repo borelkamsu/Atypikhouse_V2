@@ -1,267 +1,198 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
-import { Star, MapPin, Users, Heart, Search, Filter } from 'lucide-react'
+import { Star, MapPin, Users } from 'lucide-react'
+import { getProperties, type Property } from '@/lib/server/properties'
+import FiltersWrapper from '@/components/properties/filters-wrapper'
 
-interface Property {
-  _id: string
-  title: string
-  description: string
-  type: string
-  location: {
-    address: string
-    city: string
-    country: string
+interface PageProps {
+  searchParams: {
+    search?: string
+    type?: string
+    city?: string
+    minPrice?: string
+    maxPrice?: string
+    page?: string
   }
-  price: {
-    perNight: number
-    currency: string
-  }
-  capacity: {
-    guests: number
-    bedrooms: number
-    bathrooms: number
-  }
-  images: string[]
-  rating: number
-  isAvailable: boolean
 }
 
-export default function PropertiesPage() {
-  const router = useRouter()
-  const [properties, setProperties] = useState<Property[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedType, setSelectedType] = useState('')
-  const [selectedCity, setSelectedCity] = useState('')
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' })
+export default async function PropertiesPage({ searchParams }: PageProps) {
+  // Fetch des données côté serveur (SSR)
+  const data = await getProperties({
+    search: searchParams.search,
+    type: searchParams.type,
+    city: searchParams.city,
+    minPrice: searchParams.minPrice,
+    maxPrice: searchParams.maxPrice,
+    page: searchParams.page ? parseInt(searchParams.page) : 1
+  })
 
-  useEffect(() => {
-    fetchProperties()
-  }, [])
-
-  const fetchProperties = async () => {
-    try {
-      const params = new URLSearchParams()
-      if (searchTerm) params.append('search', searchTerm)
-      if (selectedType) params.append('type', selectedType)
-      if (selectedCity) params.append('city', selectedCity)
-      if (priceRange.min) params.append('minPrice', priceRange.min)
-      if (priceRange.max) params.append('maxPrice', priceRange.max)
-
-      const response = await fetch(`/api/properties?${params.toString()}`)
-      if (response.ok) {
-        const data = await response.json()
-        setProperties(data.properties || [])
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des propriétés:', error)
-    } finally {
-      setLoading(false)
+  const getTypeLabel = (type: string) => {
+    const types: Record<string, string> = {
+      cabin: 'Cabane',
+      yurt: 'Yourte',
+      floating: 'Logement flottant',
+      dome: 'Dôme',
+      caravan: 'Caravane',
+      igloo: 'Igloo',
+      other: 'Autre'
     }
-  }
-
-  const handleSearch = () => {
-    setLoading(true)
-    fetchProperties()
-  }
-
-  const propertyTypes = [
-    { value: 'cabin', label: 'Cabane' },
-    { value: 'yurt', label: 'Yourte' },
-    { value: 'floating', label: 'Logement flottant' },
-    { value: 'dome', label: 'Dôme' },
-    { value: 'caravan', label: 'Caravane' },
-    { value: 'igloo', label: 'Igloo' },
-    { value: 'other', label: 'Autre' }
-  ]
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    )
+    return types[type] || type
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary to-primary/80 text-white py-16">
+      <div className="bg-gradient-to-r from-primary to-primary/80 text-white py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-4" data-testid="text-page-title">
             Découvrez nos Logements Atypiques
           </h1>
-          <p className="text-xl text-center opacity-90 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-center opacity-90 max-w-2xl mx-auto">
             Trouvez votre prochaine aventure dans un logement unique et mémorable
           </p>
         </div>
       </div>
 
-      {/* Filtres */}
+      {/* Filtres - Client Component wrapper */}
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Recherche
-              </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Rechercher..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
+        <FiltersWrapper 
+          initialSearch={searchParams.search}
+          initialType={searchParams.type}
+          initialCity={searchParams.city}
+          initialMinPrice={searchParams.minPrice}
+          initialMaxPrice={searchParams.maxPrice}
+        />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Type
-              </label>
-              <Select value={selectedType} onValueChange={setSelectedType}>
-                <option value="">Tous les types</option>
-                {propertyTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </Select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Ville
-              </label>
-              <Input
-                placeholder="Ville"
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Prix min (€)
-              </label>
-              <Input
-                type="number"
-                placeholder="0"
-                value={priceRange.min}
-                onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Prix max (€)
-              </label>
-              <Input
-                type="number"
-                placeholder="1000"
-                value={priceRange.max}
-                onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 flex justify-center">
-            <Button onClick={handleSearch} className="px-8">
-              <Filter className="mr-2 h-4 w-4" />
-              Filtrer
-            </Button>
-          </div>
+        {/* Résultats - SSR */}
+        <div className="mb-6">
+          <p className="text-gray-600" data-testid="text-results-count">
+            {data.pagination.total} logement{data.pagination.total > 1 ? 's' : ''} trouvé{data.pagination.total > 1 ? 's' : ''}
+          </p>
         </div>
 
-        {/* Liste des propriétés */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {properties.map((property) => (
-            <Card key={property._id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
-              <div className="aspect-video bg-gray-200 relative">
-                {property.images && property.images.length > 0 ? (
-                  <img
-                    src={property.images[0]}
-                    alt={property.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <span>Aucune image</span>
+        {/* Grille de propriétés - SSR */}
+        {data.properties.length === 0 ? (
+          <div className="text-center py-16" data-testid="text-no-results">
+            <p className="text-xl text-gray-600 mb-4">Aucun logement trouvé</p>
+            <p className="text-gray-500">Essayez de modifier vos critères de recherche</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {data.properties.map((property: Property) => (
+              <Link 
+                key={property._id} 
+                href={`/properties/${property._id}`}
+                data-testid={`card-property-${property._id}`}
+              >
+                <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full">
+                  {/* Image */}
+                  <div className="relative h-64 bg-gray-200">
+                    {property.images && property.images.length > 0 ? (
+                      <img
+                        src={property.images[0]}
+                        alt={property.title}
+                        className="w-full h-full object-cover"
+                        data-testid={`img-property-${property._id}`}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                        <MapPin className="h-16 w-16 text-gray-400" />
+                      </div>
+                    )}
+                    
+                    {/* Badge Type */}
+                    <div className="absolute top-4 left-4">
+                      <Badge className="bg-white text-primary border-none shadow-md">
+                        {getTypeLabel(property.type)}
+                      </Badge>
+                    </div>
+                    
+                    {/* Badge Disponibilité */}
+                    {!property.isAvailable && (
+                      <div className="absolute top-4 right-4">
+                        <Badge variant="destructive">
+                          Non disponible
+                        </Badge>
+                      </div>
+                    )}
                   </div>
-                )}
-                <div className="absolute top-4 right-4">
-                  <Badge variant="secondary" className="bg-white/90">
-                    {property.type}
-                  </Badge>
-                </div>
-              </div>
 
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">{property.title}</CardTitle>
-                  <div className="flex items-center space-x-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-medium">{property.rating}</span>
-                  </div>
-                </div>
-                <CardDescription className="flex items-center text-gray-600">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {property.location.city}, {property.location.country}
-                </CardDescription>
-              </CardHeader>
+                  <CardContent className="p-5">
+                    {/* Titre et Rating */}
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 
+                        className="font-playfair font-semibold text-lg text-gray-900 flex-1 mr-2 line-clamp-2"
+                        data-testid={`text-property-title-${property._id}`}
+                      >
+                        {property.title}
+                      </h3>
+                      <div className="flex items-center flex-shrink-0">
+                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                        <span className="text-sm font-medium text-gray-700 ml-1">
+                          {property.rating.toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
 
-              <CardContent>
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <Users className="h-4 w-4 mr-1" />
-                    {property.capacity.guests} voyageurs
-                  </div>
-                  <div>
-                    {property.capacity.bedrooms} chambre{property.capacity.bedrooms > 1 ? 's' : ''}
-                  </div>
-                  <div>
-                    {property.capacity.bathrooms} salle{property.capacity.bathrooms > 1 ? 's' : ''} de bain
-                  </div>
-                </div>
+                    {/* Localisation */}
+                    <div className="flex items-center text-gray-600 mb-3">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      <span className="text-sm" data-testid={`text-property-location-${property._id}`}>
+                        {property.location.city}, {property.location.country}
+                      </span>
+                    </div>
 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-2xl font-bold text-primary">
-                      {property.price.perNight}€
-                    </span>
-                    <span className="text-gray-600"> / nuit</span>
-                  </div>
-                  <Button
-                    onClick={() => router.push(`/properties/${property._id}`)}
-                    size="sm"
-                  >
-                    Voir les détails
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                    {/* Capacité */}
+                    <div className="flex items-center text-gray-600 mb-4">
+                      <Users className="h-4 w-4 mr-1" />
+                      <span className="text-sm">
+                        {property.capacity.guests} voyageur{property.capacity.guests > 1 ? 's' : ''} · {' '}
+                        {property.capacity.bedrooms} chambre{property.capacity.bedrooms > 1 ? 's' : ''}
+                      </span>
+                    </div>
 
-        {properties.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <Search className="h-16 w-16 mx-auto" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Aucune propriété trouvée
-            </h3>
-            <p className="text-gray-600">
-              Essayez de modifier vos critères de recherche
-            </p>
+                    {/* Description courte */}
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                      {property.description}
+                    </p>
+
+                    {/* Prix */}
+                    <div className="border-t pt-4">
+                      <div className="flex items-baseline">
+                        <span 
+                          className="text-2xl font-bold text-primary"
+                          data-testid={`text-property-price-${property._id}`}
+                        >
+                          €{property.price.perNight}
+                        </span>
+                        <span className="text-gray-600 ml-1">/nuit</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination - SSR */}
+        {data.pagination.totalPages > 1 && (
+          <div className="flex justify-center gap-2 mt-8">
+            {Array.from({ length: data.pagination.totalPages }, (_, i) => i + 1).map((page) => (
+              <Link
+                key={page}
+                href={`/properties?${new URLSearchParams({ ...searchParams, page: page.toString() }).toString()}`}
+                className={`px-4 py-2 rounded-md ${
+                  page === data.pagination.page
+                    ? 'bg-primary text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+                data-testid={`link-page-${page}`}
+              >
+                {page}
+              </Link>
+            ))}
           </div>
         )}
       </div>

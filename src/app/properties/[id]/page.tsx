@@ -1,387 +1,219 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { notFound } from 'next/navigation'
+import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Star, MapPin, Users, Bed, Bath, Calendar, Heart, Share2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Star, MapPin, Users, Bed, Bath, Share2 } from 'lucide-react'
+import { getPropertyById, checkFavorite } from '@/lib/server/properties'
+import FavoriteButton from '@/components/properties/favorite-button'
+import BookingForm from '@/components/properties/booking-form'
 
-interface Property {
-  _id: string
-  title: string
-  description: string
-  type: string
-  location: {
-    address: string
-    city: string
-    country: string
-    coordinates?: {
-      lat: number
-      lng: number
-    }
-  }
-  price: {
-    perNight: number
-    currency: string
-  }
-  capacity: {
-    guests: number
-    bedrooms: number
-    bathrooms: number
-  }
-  amenities: string[]
-  images: string[]
-  rating: number
-  isAvailable: boolean
-  owner: {
-    _id: string
-    firstName: string
-    lastName: string
+interface PageProps {
+  params: {
+    id: string
   }
 }
 
-export default function PropertyDetailPage() {
-  const params = useParams()
-  const router = useRouter()
-  const [property, setProperty] = useState<Property | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [bookingData, setBookingData] = useState({
-    startDate: '',
-    endDate: '',
-    guests: 1
-  })
-  const [isFavorited, setIsFavorited] = useState(false)
-
-  useEffect(() => {
-    if (params.id) {
-      fetchProperty()
-      checkFavorite()
-    }
-  }, [params.id])
-
-  const fetchProperty = async () => {
-    try {
-      const response = await fetch(`/api/properties/${params.id}`)
-      if (response.ok) {
-        const data = await response.json()
-        setProperty(data)
-      } else {
-        router.push('/properties')
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement de la propriété:', error)
-      router.push('/properties')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const checkFavorite = async () => {
-    try {
-      const response = await fetch(`/api/favorites/${params.id}/check`)
-      if (response.ok) {
-        const data = await response.json()
-        setIsFavorited(data.isFavorited)
-      }
-    } catch (error) {
-      console.error('Erreur lors de la vérification des favoris:', error)
-    }
-  }
-
-  const toggleFavorite = async () => {
-    try {
-      if (isFavorited) {
-        await fetch(`/api/favorites/${params.id}`, { method: 'DELETE' })
-      } else {
-        await fetch('/api/favorites', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ propertyId: params.id })
-        })
-      }
-      setIsFavorited(!isFavorited)
-    } catch (error) {
-      console.error('Erreur lors de la gestion des favoris:', error)
-    }
-  }
-
-  const handleBooking = async () => {
-    try {
-      const response = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          propertyId: params.id,
-          startDate: bookingData.startDate,
-          endDate: bookingData.endDate,
-          guests: bookingData.guests
-        })
-      })
-
-      if (response.ok) {
-        router.push('/dashboard')
-      } else {
-        const error = await response.json()
-        alert(error.message || 'Erreur lors de la réservation')
-      }
-    } catch (error) {
-      console.error('Erreur lors de la réservation:', error)
-      alert('Erreur lors de la réservation')
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
-
+export default async function PropertyDetailPage({ params }: PageProps) {
+  // Fetch des données côté serveur
+  const property = await getPropertyById(params.id)
+  
   if (!property) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Propriété non trouvée
-          </h1>
-          <Button onClick={() => router.push('/properties')}>
-            Retour aux propriétés
-          </Button>
-        </div>
-      </div>
-    )
+    notFound()
   }
 
-  const calculateTotalPrice = () => {
-    if (!bookingData.startDate || !bookingData.endDate) return 0
-    const start = new Date(bookingData.startDate)
-    const end = new Date(bookingData.endDate)
-    const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-    return days * property.price.perNight
+  // Vérifier si favoris (optionnel, ne pas bloquer si non connecté)
+  const isFavorited = await checkFavorite(params.id)
+
+  const getTypeLabel = (type: string) => {
+    const types: Record<string, string> = {
+      cabin: 'Cabane dans les arbres',
+      yurt: 'Yourte',
+      floating: 'Logement flottant',
+      dome: 'Dôme',
+      caravan: 'Caravane',
+      igloo: 'Igloo',
+      other: 'Autre'
+    }
+    return types[type] || type
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Images */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden mb-4">
-              {property.images && property.images.length > 0 ? (
-                <img
-                  src={property.images[selectedImage]}
-                  alt={property.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <span>Aucune image</span>
+        {/* En-tête */}
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4">
+            <div className="flex-1">
+              <h1 
+                className="text-3xl md:text-4xl font-bold text-gray-900 mb-2"
+                data-testid="text-property-title"
+              >
+                {property.title}
+              </h1>
+              <div className="flex flex-wrap items-center gap-4 text-gray-600">
+                <div className="flex items-center">
+                  <Star className="h-5 w-5 text-yellow-400 fill-current mr-1" />
+                  <span className="font-semibold" data-testid="text-rating">
+                    {property.rating.toFixed(1)}
+                  </span>
                 </div>
-              )}
-            </div>
-            
-            {property.images && property.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
-                {property.images.slice(0, 4).map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`aspect-video bg-gray-200 rounded overflow-hidden ${
-                      selectedImage === index ? 'ring-2 ring-primary' : ''
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${property.title} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
+                <div className="flex items-center">
+                  <MapPin className="h-5 w-5 mr-1" />
+                  <span data-testid="text-location">
+                    {property.location.city}, {property.location.country}
+                  </span>
+                </div>
+                <Badge>{getTypeLabel(property.type)}</Badge>
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Réservation */}
-          <div>
-            <Card className="sticky top-8">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-2xl font-bold text-primary">
-                      {property.price.perNight}€
-                    </span>
-                    <span className="text-gray-600"> / nuit</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium">{property.rating}</span>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="startDate">Arrivée</Label>
-                    <Input
-                      id="startDate"
-                      type="date"
-                      value={bookingData.startDate}
-                      onChange={(e) => setBookingData({ ...bookingData, startDate: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="endDate">Départ</Label>
-                    <Input
-                      id="endDate"
-                      type="date"
-                      value={bookingData.endDate}
-                      onChange={(e) => setBookingData({ ...bookingData, endDate: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="guests">Voyageurs</Label>
-                  <Input
-                    id="guests"
-                    type="number"
-                    min="1"
-                    max={property.capacity.guests}
-                    value={bookingData.guests}
-                    onChange={(e) => setBookingData({ ...bookingData, guests: parseInt(e.target.value) })}
-                  />
-                </div>
-
-                {calculateTotalPrice() > 0 && (
-                  <div className="border-t pt-4">
-                    <div className="flex justify-between text-lg font-medium">
-                      <span>Total</span>
-                      <span>{calculateTotalPrice()}€</span>
-                    </div>
-                  </div>
-                )}
-
-                <Button 
-                  onClick={handleBooking}
-                  className="w-full"
-                  disabled={!bookingData.startDate || !bookingData.endDate}
-                >
-                  Réserver
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="flex gap-2">
+              <Button variant="outline" size="icon" data-testid="button-share">
+                <Share2 className="h-5 w-5" />
+              </Button>
+              <FavoriteButton 
+                propertyId={params.id} 
+                initialIsFavorited={isFavorited}
+              />
+            </div>
           </div>
         </div>
 
-        {/* Détails */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-2xl">{property.title}</CardTitle>
-                    <CardDescription className="flex items-center mt-2">
-                      <MapPin className="h-4 w-4 mr-1" />
-                      {property.location.address}, {property.location.city}, {property.location.country}
-                    </CardDescription>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" onClick={toggleFavorite}>
-                      <Heart className={`h-4 w-4 mr-1 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-                      {isFavorited ? 'Favori' : 'Ajouter aux favoris'}
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Share2 className="h-4 w-4 mr-1" />
-                      Partager
-                    </Button>
-                  </div>
+        {/* Galerie d'images */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-8 rounded-xl overflow-hidden">
+          {property.images && property.images.length > 0 ? (
+            <>
+              <div className="md:row-span-2">
+                <img
+                  src={property.images[0]}
+                  alt={property.title}
+                  className="w-full h-full object-cover"
+                  data-testid="img-property-main"
+                />
+              </div>
+              {property.images.slice(1, 5).map((image, index) => (
+                <div key={index} className="h-48 md:h-auto">
+                  <img
+                    src={image}
+                    alt={`${property.title} - ${index + 2}`}
+                    className="w-full h-full object-cover"
+                    data-testid={`img-property-${index + 1}`}
+                  />
                 </div>
-              </CardHeader>
+              ))}
+            </>
+          ) : (
+            <div className="col-span-2 h-96 bg-gray-200 flex items-center justify-center">
+              <MapPin className="h-24 w-24 text-gray-400" />
+            </div>
+          )}
+        </div>
 
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="flex items-center">
-                    <Users className="h-5 w-5 mr-2 text-gray-600" />
-                    <span>{property.capacity.guests} voyageurs</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Bed className="h-5 w-5 mr-2 text-gray-600" />
-                    <span>{property.capacity.bedrooms} chambre{property.capacity.bedrooms > 1 ? 's' : ''}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Bath className="h-5 w-5 mr-2 text-gray-600" />
-                    <span>{property.capacity.bathrooms} salle{property.capacity.bathrooms > 1 ? 's' : ''} de bain</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Badge variant="secondary">{property.type}</Badge>
-                  </div>
-                </div>
-
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-3">Description</h3>
-                  <p className="text-gray-700 leading-relaxed">{property.description}</p>
-                </div>
-
-                {property.amenities && property.amenities.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3">Équipements</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {property.amenities.map((amenity, index) => (
-                        <Badge key={index} variant="outline" className="justify-start">
-                          {amenity}
-                        </Badge>
-                      ))}
+        {/* Contenu principal */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Colonne principale */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Informations générales */}
+            <Card className="p-6">
+              <div className="border-b pb-6 mb-6">
+                <h2 className="text-2xl font-bold mb-4">Informations sur le logement</h2>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-gray-600" />
+                    <div>
+                      <div className="font-semibold" data-testid="text-guests">
+                        {property.capacity.guests} voyageurs
+                      </div>
                     </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Informations supplémentaires */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Propriétaire</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-medium">
-                      {property.owner?.firstName?.[0]}{property.owner?.lastName?.[0]}
-                    </span>
+                  <div className="flex items-center gap-2">
+                    <Bed className="h-5 w-5 text-gray-600" />
+                    <div>
+                      <div className="font-semibold" data-testid="text-bedrooms">
+                        {property.capacity.bedrooms} chambre{property.capacity.bedrooms > 1 ? 's' : ''}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">
-                      {property.owner?.firstName} {property.owner?.lastName}
-                    </p>
-                    <p className="text-sm text-gray-600">Propriétaire</p>
+                  <div className="flex items-center gap-2">
+                    <Bath className="h-5 w-5 text-gray-600" />
+                    <div>
+                      <div className="font-semibold" data-testid="text-bathrooms">
+                        {property.capacity.bathrooms} salle{property.capacity.bathrooms > 1 ? 's' : ''} de bain
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
+              </div>
+
+              <div className="border-b pb-6 mb-6">
+                <h3 className="text-xl font-semibold mb-4">Description</h3>
+                <p className="text-gray-700 leading-relaxed" data-testid="text-description">
+                  {property.description}
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold mb-4">Équipements</h3>
+                {property.amenities && property.amenities.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    {property.amenities.map((amenity, index) => (
+                      <div 
+                        key={index}
+                        className="flex items-center gap-2 text-gray-700"
+                        data-testid={`text-amenity-${index}`}
+                      >
+                        <span className="text-primary">✓</span>
+                        <span>{amenity}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">Aucun équipement spécifié</p>
+                )}
+              </div>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Règles de la maison</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm">
-                  <li>• Arrivée après 15h00</li>
-                  <li>• Départ avant 11h00</li>
-                  <li>• Animaux acceptés</li>
-                  <li>• Fumeurs acceptés</li>
-                </ul>
-              </CardContent>
+            {/* Localisation */}
+            <Card className="p-6">
+              <h3 className="text-xl font-semibold mb-4">Localisation</h3>
+              <div className="space-y-2">
+                <p className="text-gray-700">
+                  <span className="font-semibold">Adresse:</span> {property.location.address}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Ville:</span> {property.location.city}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-semibold">Pays:</span> {property.location.country}
+                </p>
+              </div>
             </Card>
+
+            {/* Propriétaire */}
+            {property.owner && (
+              <Card className="p-6">
+                <h3 className="text-xl font-semibold mb-4">Propriétaire</h3>
+                <div className="flex items-center gap-4">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Users className="h-8 w-8 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-lg" data-testid="text-owner-name">
+                      {property.owner.firstName} {property.owner.lastName}
+                    </p>
+                    <p className="text-gray-600">Hôte AtypikHouse</p>
+                  </div>
+                </div>
+              </Card>
+            )}
+          </div>
+
+          {/* Formulaire de réservation */}
+          <div className="lg:col-span-1">
+            <BookingForm 
+              propertyId={params.id}
+              pricePerNight={property.price.perNight}
+            />
           </div>
         </div>
       </div>

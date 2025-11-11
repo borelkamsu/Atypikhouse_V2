@@ -18,9 +18,9 @@ import {
   XCircle,
   AlertCircle,
   Building,
-  Pencil,
-  Trash2
+  Pencil
 } from 'lucide-react';
+import { DeletePropertyForm } from '@/components/owner/delete-property-form';
 
 interface Property {
   _id: string;
@@ -402,14 +402,10 @@ export default function OwnerDashboard() {
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteProperty(property._id, property.title)}
-                          data-testid={`button-delete-${property._id}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <DeletePropertyForm 
+                          propertyId={property._id} 
+                          propertyTitle={property.title} 
+                        />
                       </div>
                     </div>
                   ))}

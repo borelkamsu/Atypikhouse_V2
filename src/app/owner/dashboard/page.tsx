@@ -88,22 +88,29 @@ export default function OwnerDashboard() {
 
   const fetchDashboardData = async () => {
     try {
+      let propertiesArray: Property[] = [];
+      let bookingsArray: Booking[] = [];
+      
       // Récupérer les propriétés du propriétaire
       const propertiesResponse = await fetch('/api/properties?owner=true');
       if (propertiesResponse.ok) {
         const propertiesData = await propertiesResponse.json();
-        setProperties(propertiesData);
+        // L'API retourne {properties: [...], pagination: {...}}
+        propertiesArray = propertiesData.properties || [];
+        setProperties(propertiesArray);
       }
 
       // Récupérer les réservations
       const bookingsResponse = await fetch('/api/bookings?owner=true');
       if (bookingsResponse.ok) {
         const bookingsData = await bookingsResponse.json();
-        setBookings(bookingsData);
+        // L'API bookings retourne un tableau direct (pas une structure avec pagination)
+        bookingsArray = Array.isArray(bookingsData) ? bookingsData : [];
+        setBookings(bookingsArray);
       }
 
       // Calculer les statistiques
-      calculateStats(propertiesData || [], bookingsData || []);
+      calculateStats(propertiesArray, bookingsArray);
 
     } catch (error) {
       toast({
@@ -153,7 +160,7 @@ export default function OwnerDashboard() {
           title: action === 'confirm' ? 'Réservation confirmée' : 'Réservation rejetée',
           description: `La réservation a été ${action === 'confirm' ? 'confirmée' : 'rejetée'} avec succès.`,
         });
-        fetchDashboardData(); // Recharger les données
+        fetchDashboardData();
       } else {
         toast({
           title: 'Erreur',

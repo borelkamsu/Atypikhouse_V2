@@ -14,9 +14,22 @@ export async function GET(request: NextRequest) {
     const city = searchParams.get('city');
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
+    const ownerOnly = searchParams.get('owner') === 'true';
 
     // Construire le filtre
-    const filter: any = { isAvailable: true };
+    const filter: any = {};
+    
+    // Si owner=true, filtrer par propriétaire connecté
+    if (ownerOnly) {
+      const token = verifyTokenFromRequest(request);
+      if (!token) {
+        return NextResponse.json({ message: 'Non autorisé' }, { status: 401 });
+      }
+      filter.owner = token.userId;
+    } else {
+      // Sinon, filtrer par disponibilité pour la recherche publique
+      filter.isAvailable = true;
+    }
 
     if (type) {
       filter.type = type;
@@ -64,7 +77,6 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();

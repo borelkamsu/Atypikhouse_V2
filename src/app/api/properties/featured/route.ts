@@ -18,12 +18,12 @@ export async function GET(request: NextRequest) {
     const recentBookings = await Booking.find()
       .sort({ createdAt: -1 })
       .limit(limit * 3) // Prendre plus de bookings pour assurer d'avoir assez de propriétés uniques
-      .select('property')
+      .select('propertyId')
       .lean();
 
     // Extraire les IDs de propriétés uniques (éviter les doublons)
     const uniquePropertyIds = [...new Set(
-      recentBookings.map(booking => booking.property.toString())
+      recentBookings.map(booking => (booking as any).propertyId.toString())
     )].slice(0, limit); // Limiter au nombre demandé
 
     // Si aucune réservation n'existe, récupérer les propriétés les plus récentes

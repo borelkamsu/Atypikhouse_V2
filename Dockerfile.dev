@@ -1,0 +1,32 @@
+# Dockerfile pour le développement
+FROM node:20-alpine
+
+# Installer les dépendances nécessaires
+RUN apk --no-cache add bash
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de dépendances
+COPY package*.json ./
+
+# Installer toutes les dépendances (dev + prod)
+RUN npm install
+
+# Copier le code source
+COPY . .
+
+# Créer le dossier uploads pour les images
+RUN mkdir -p uploads && chmod 777 uploads
+
+# Exposer le port
+EXPOSE 3000
+
+# Définir les variables d'environnement
+ENV NODE_ENV=development
+ENV PORT=3000
+
+# Commande pour démarrer en mode développement
+CMD ["npm", "run", "dev"]
+
+

@@ -17,7 +17,9 @@ import {
   CheckCircle, 
   XCircle,
   AlertCircle,
-  Building
+  Building,
+  Pencil,
+  Trash2
 } from 'lucide-react';
 
 interface Property {
@@ -172,6 +174,36 @@ export default function OwnerDashboard() {
       toast({
         title: 'Erreur',
         description: 'Une erreur est survenue',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleDeleteProperty = async (propertyId: string, propertyTitle: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer "${propertyTitle}" ? Cette action est irréversible.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/properties/${propertyId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erreur lors de la suppression');
+      }
+
+      toast({
+        title: 'Succès',
+        description: 'Propriété supprimée avec succès',
+      });
+
+      fetchDashboardData();
+    } catch (error: any) {
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Erreur lors de la suppression de la propriété',
         variant: 'destructive',
       });
     }
@@ -360,6 +392,24 @@ export default function OwnerDashboard() {
                             {property.isAvailable ? 'Disponible' : 'Indisponible'}
                           </Badge>
                         </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => router.push(`/owner/properties/${property._id}/edit`)}
+                          data-testid={`button-edit-${property._id}`}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteProperty(property._id, property.title)}
+                          data-testid={`button-delete-${property._id}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   ))}

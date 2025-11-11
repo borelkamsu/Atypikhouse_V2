@@ -41,7 +41,25 @@ export async function GET(request: NextRequest) {
       .populate('owner', 'firstName lastName email companyName')
       .sort({ createdAt: -1 });
 
-    return NextResponse.json(properties);
+    // Filtrer les propriétés avec owner null et fournir un objet de repli pour les orphelines
+    const propertiesWithOwner = properties.map(property => {
+      const propertyObj = property.toObject();
+      
+      // Si le propriétaire n'existe pas (supprimé), fournir un objet de repli
+      if (!propertyObj.owner) {
+        propertyObj.owner = {
+          _id: 'unknown',
+          firstName: 'Propriétaire',
+          lastName: 'inconnu',
+          email: 'N/A',
+          companyName: null
+        };
+      }
+      
+      return propertyObj;
+    });
+
+    return NextResponse.json(propertiesWithOwner);
   } catch (error) {
     console.error('Erreur lors de la récupération des propriétés:', error);
     return NextResponse.json(
@@ -77,7 +95,19 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ message: 'Propriété non trouvée' }, { status: 404 });
     }
 
-    return NextResponse.json(property);
+    // Gérer le cas où le propriétaire n'existe pas
+    const propertyObj = property.toObject();
+    if (!propertyObj.owner) {
+      propertyObj.owner = {
+        _id: 'unknown',
+        firstName: 'Propriétaire',
+        lastName: 'inconnu',
+        email: 'N/A',
+        companyName: null
+      };
+    }
+
+    return NextResponse.json(propertyObj);
   } catch (error) {
     console.error('Erreur lors de la mise à jour de la propriété:', error);
     return NextResponse.json(

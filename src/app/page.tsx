@@ -1,10 +1,85 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Search, MapPin, Calendar, Users, Star, Heart, ArrowRight } from 'lucide-react';
+import { Search, MapPin, Calendar, Users, Star, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { FavoriteButton } from '@/components/property/favorite-button';
 
-export default function Home() {
+// Types pour les données
+interface Property {
+  _id: string;
+  title: string;
+  description: string;
+  type: string;
+  location: {
+    city: string;
+    country: string;
+  };
+  price: {
+    perNight: number;
+    currency: string;
+  };
+  images: Array<{ url: string; publicId: string }>;
+  rating: number;
+}
+
+interface Category {
+  type: string;
+  title: string;
+  description: string;
+  count: number;
+}
+
+// Fetch des propriétés en vedette (SSR)
+async function getFeaturedProperties(): Promise<Property[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5000';
+    const res = await fetch(`${baseUrl}/api/properties/featured?limit=6`, {
+      cache: 'no-store' // Toujours récupérer les données fraîches
+    });
+    
+    if (!res.ok) {
+      console.error('Erreur lors de la récupération des propriétés en vedette');
+      return [];
+    }
+    
+    const data = await res.json();
+    return data.properties || [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des propriétés en vedette:', error);
+    return [];
+  }
+}
+
+// Fetch des catégories (SSR)
+async function getCategories(): Promise<Category[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5000';
+    const res = await fetch(`${baseUrl}/api/properties/categories`, {
+      cache: 'no-store'
+    });
+    
+    if (!res.ok) {
+      console.error('Erreur lors de la récupération des catégories');
+      return [];
+    }
+    
+    const data = await res.json();
+    return data.categories || [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des catégories:', error);
+    return [];
+  }
+}
+
+export default async function Home() {
+  // Fetch des données côté serveur (SSR)
+  const [featuredProperties, categories] = await Promise.all([
+    getFeaturedProperties(),
+    getCategories()
+  ]);
+
   return (
     <div className="min-h-screen bg-white">
       <section className="relative py-20 px-4 bg-gradient-to-br from-green-50 to-blue-50">
@@ -61,72 +136,106 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Types d'habitations - VRAIES CATÉGORIES */}
       <section className="py-16 px-4 bg-white">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12 font-heading">
             Types d'habitations
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="group hover:shadow-xl transition-shadow border-gray-200">
-              <CardHeader>
-                <CardTitle className="font-heading">Cabanes</CardTitle>
-                <CardDescription className="font-body">
-                  Dormez dans les arbres et profitez d'une vue imprenable sur la nature.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            
-            <Card className="group hover:shadow-xl transition-shadow border-gray-200">
-              <CardHeader>
-                <CardTitle className="font-heading">Yourtes</CardTitle>
-                <CardDescription className="font-body">
-                  Expérimentez le confort moderne dans une habitation traditionnelle.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            
-            <Card className="group hover:shadow-xl transition-shadow border-gray-200">
-              <CardHeader>
-                <CardTitle className="font-heading">Maisons flottantes</CardTitle>
-                <CardDescription className="font-body">
-                  Vivez au rythme de l'eau dans une habitation unique sur l'eau.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
+          {categories.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {categories.slice(0, 6).map((category) => (
+                <Link 
+                  key={category.type} 
+                  href={`/properties?type=${category.type}`}
+                  data-testid={`category-${category.type}`}
+                >
+                  <Card className="group hover:shadow-xl transition-shadow border-gray-200 cursor-pointer h-full">
+                    <CardHeader>
+                      <CardTitle className="font-heading flex items-center justify-between">
+                        {category.title}
+                        <span className="text-sm text-gray-500 font-normal">
+                          {category.count} {category.count > 1 ? 'propriétés' : 'propriété'}
+                        </span>
+                      </CardTitle>
+                      <CardDescription className="font-body">
+                        {category.description}
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500">Aucune catégorie disponible pour le moment.</p>
+          )}
         </div>
       </section>
 
+      {/* Habitations en vedette - PROPRIÉTÉS LES PLUS RÉSERVÉES */}
       <section className="py-16 px-4 bg-gray-50">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12 font-heading">
             Habitations en vedette
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="group hover:shadow-xl transition-shadow border-gray-200">
-                <div className="aspect-video bg-gradient-to-r from-primary/20 to-secondary/20 rounded-t-lg"></div>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-lg font-heading">Habitation {i}</h3>
-                    <Button variant="ghost" size="icon">
-                      <Heart className="h-5 w-5" />
-                    </Button>
-                  </div>
-                  <p className="text-gray-600 mb-4 font-body">
-                    Description de l'habitation avec ses caractéristiques uniques.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                      <span className="ml-1 text-sm">4.8</span>
+          {featuredProperties.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {featuredProperties.slice(0, 6).map((property) => (
+                <Card 
+                  key={property._id} 
+                  className="group hover:shadow-xl transition-shadow border-gray-200 overflow-hidden"
+                  data-testid={`featured-property-${property._id}`}
+                >
+                  <Link href={`/properties/${property._id}`}>
+                    <div className="aspect-video relative overflow-hidden bg-gray-100">
+                      {property.images && property.images.length > 0 ? (
+                        <Image
+                          src={property.images[0].url}
+                          alt={property.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-r from-primary/20 to-secondary/20 flex items-center justify-center">
+                          <span className="text-gray-400">Pas d'image</span>
+                        </div>
+                      )}
                     </div>
-                    <span className="font-bold text-primary">120€/nuit</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </Link>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <Link href={`/properties/${property._id}`}>
+                        <h3 className="font-semibold text-lg font-heading hover:text-primary transition-colors line-clamp-1">
+                          {property.title}
+                        </h3>
+                      </Link>
+                      <FavoriteButton propertyId={property._id} />
+                    </div>
+                    <Link href={`/properties/${property._id}`}>
+                      <p className="text-gray-600 mb-2 font-body text-sm">
+                        {property.location.city}, {property.location.country}
+                      </p>
+                      <p className="text-gray-600 mb-4 font-body line-clamp-2">
+                        {property.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                          <span className="ml-1 text-sm">{property.rating?.toFixed(1) || 'Nouveau'}</span>
+                        </div>
+                        <span className="font-bold text-primary">
+                          {property.price.perNight}€/nuit
+                        </span>
+                      </div>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500">Aucune propriété disponible pour le moment.</p>
+          )}
         </div>
       </section>
 

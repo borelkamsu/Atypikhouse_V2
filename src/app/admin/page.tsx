@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { PropertiesManagement } from "@/components/admin/properties-management";
+import { UsersManagement } from "@/components/admin/users-management";
+import { OwnersManagement } from "@/components/admin/owners-management";
+import { BookingsManagement } from "@/components/admin/bookings-management";
 
 interface DashboardStats {
   totalUsers: number;
@@ -42,18 +45,26 @@ export default function AdminDashboard() {
 
   const fetchDashboardStats = async () => {
     try {
-      // Pour l'instant, on utilise des données simulées
-      // Plus tard, on pourra créer une API /api/admin/dashboard/stats
-      setStats({
-        totalUsers: 150,
-        totalProperties: 25,
-        totalBookings: 180,
-        pendingOwners: 5,
-        activeProperties: 20,
-        inactiveProperties: 5,
-        confirmedBookings: 165,
-        pendingBookings: 15,
-      });
+      const response = await fetch('/api/admin/stats');
+      
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          toast({
+            title: "Non autorisé",
+            description: "Vous devez être connecté en tant qu'administrateur",
+            variant: "destructive",
+          });
+          // Rediriger vers la page de connexion admin
+          setTimeout(() => {
+            window.location.href = '/admin/login';
+          }, 1000);
+          return;
+        }
+        throw new Error('Erreur lors de la récupération des statistiques');
+      }
+
+      const data = await response.json();
+      setStats(data);
     } catch (error) {
       console.error('Erreur lors du chargement des statistiques:', error);
       toast({
@@ -67,13 +78,12 @@ export default function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    // Supprimer le token et rediriger
     document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     toast({
       title: "Déconnexion",
       description: "Vous avez été déconnecté avec succès",
     });
-    router.push('/admin/login');
+    window.location.href = '/admin/login';
   };
 
   return (
@@ -90,7 +100,7 @@ export default function AdminDashboard() {
                 Interface d'administration
               </p>
             </div>
-            <Button variant="outline" onClick={handleLogout}>
+            <Button variant="outline" onClick={handleLogout} data-testid="button-logout">
               <LogOut className="w-4 h-4 mr-2" />
               Déconnexion
             </Button>
@@ -110,145 +120,147 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Utilisateurs</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
-              <p className="text-xs text-muted-foreground">
-                +12% par rapport au mois dernier
-              </p>
-            </CardContent>
-          </Card>
+        {isLoading ? (
+          <div className="text-center py-8 text-gray-500">
+            Chargement des statistiques...
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Utilisateurs</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" data-testid="stat-total-users">{stats.totalUsers}</div>
+                <p className="text-xs text-muted-foreground">
+                  Utilisateurs inscrits
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Propriétés</CardTitle>
-              <Home className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalProperties}</div>
-              <p className="text-xs text-muted-foreground">
-                {stats.activeProperties} actives, {stats.inactiveProperties} inactives
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Propriétés</CardTitle>
+                <Home className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" data-testid="stat-total-properties">{stats.totalProperties}</div>
+                <p className="text-xs text-muted-foreground">
+                  {stats.activeProperties} actives, {stats.inactiveProperties} inactives
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Réservations</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalBookings}</div>
-              <p className="text-xs text-muted-foreground">
-                {stats.confirmedBookings} confirmées, {stats.pendingBookings} en attente
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Réservations</CardTitle>
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" data-testid="stat-total-bookings">{stats.totalBookings}</div>
+                <p className="text-xs text-muted-foreground">
+                  {stats.confirmedBookings} confirmées, {stats.pendingBookings} en attente
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Propriétaires en attente</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingOwners}</div>
-              <p className="text-xs text-muted-foreground">
-                En attente de validation
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Propriétaires en attente</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" data-testid="stat-pending-owners">{stats.pendingOwners}</div>
+                <p className="text-xs text-muted-foreground">
+                  En attente de validation
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Onglets de gestion */}
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-            <TabsTrigger value="users">Utilisateurs</TabsTrigger>
-            <TabsTrigger value="properties">Propriétés</TabsTrigger>
-            <TabsTrigger value="bookings">Réservations</TabsTrigger>
-            <TabsTrigger value="owners">Propriétaires</TabsTrigger>
+            <TabsTrigger value="overview" data-testid="tab-overview">Vue d'ensemble</TabsTrigger>
+            <TabsTrigger value="users" data-testid="tab-users">Utilisateurs</TabsTrigger>
+            <TabsTrigger value="owners" data-testid="tab-owners">Propriétaires</TabsTrigger>
+            <TabsTrigger value="properties" data-testid="tab-properties">Propriétés</TabsTrigger>
+            <TabsTrigger value="bookings" data-testid="tab-bookings">Réservations</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Propriétés récentes</CardTitle>
+                  <CardTitle>Bienvenue</CardTitle>
                   <CardDescription>
-                    Les dernières propriétés ajoutées
+                    Panneau d'administration AtypikHouse
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Cabane dans les arbres</p>
-                        <p className="text-sm text-gray-600">Ajoutée il y a 2 heures</p>
-                      </div>
-                      <Badge variant="secondary">Active</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Yourte mongole</p>
-                        <p className="text-sm text-gray-600">Ajoutée il y a 1 jour</p>
-                      </div>
-                      <Badge variant="secondary">Active</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Maison troglodyte</p>
-                        <p className="text-sm text-gray-600">Ajoutée il y a 3 jours</p>
-                      </div>
-                      <Badge variant="outline">En attente</Badge>
-                    </div>
+                    <p className="text-gray-600">
+                      Utilisez les onglets ci-dessus pour gérer :
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 text-gray-600">
+                      <li><strong>Utilisateurs</strong> : Gérer les comptes utilisateurs</li>
+                      <li><strong>Propriétaires</strong> : Valider les demandes d'inscription, approuver/rejeter, activer/désactiver</li>
+                      <li><strong>Propriétés</strong> : Gérer les logements, activer/désactiver</li>
+                      <li><strong>Réservations</strong> : Suivre et gérer les réservations</li>
+                    </ul>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Réservations récentes</CardTitle>
+                  <CardTitle>Actions rapides</CardTitle>
                   <CardDescription>
-                    Les dernières réservations effectuées
+                    Tâches importantes nécessitant votre attention
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Réservation #1234</p>
-                        <p className="text-sm text-gray-600">Cabane dans les arbres</p>
+                    {stats.pendingOwners > 0 && (
+                      <div className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                          <div>
+                            <p className="font-medium text-yellow-900">
+                              {stats.pendingOwners} propriétaire(s) en attente
+                            </p>
+                            <p className="text-sm text-yellow-700">
+                              Demandes d'inscription à valider
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <Badge className="bg-green-100 text-green-800">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Confirmée
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Réservation #1233</p>
-                        <p className="text-sm text-gray-600">Yourte mongole</p>
+                    )}
+                    {stats.pendingBookings > 0 && (
+                      <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Calendar className="h-5 w-5 text-blue-600" />
+                          <div>
+                            <p className="font-medium text-blue-900">
+                              {stats.pendingBookings} réservation(s) en attente
+                            </p>
+                            <p className="text-sm text-blue-700">
+                              À confirmer ou annuler
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <Badge className="bg-yellow-100 text-yellow-800">
-                        <AlertTriangle className="w-3 h-3 mr-1" />
-                        En attente
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Réservation #1232</p>
-                        <p className="text-sm text-gray-600">Maison troglodyte</p>
+                    )}
+                    {stats.pendingOwners === 0 && stats.pendingBookings === 0 && (
+                      <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        <p className="text-green-900">
+                          Aucune action en attente
+                        </p>
                       </div>
-                      <Badge className="bg-red-100 text-red-800">
-                        <XCircle className="w-3 h-3 mr-1" />
-                        Annulée
-                      </Badge>
-                    </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -256,22 +268,11 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="users" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Gestion des Utilisateurs</CardTitle>
-                <CardDescription>
-                  Gérez les comptes utilisateurs de la plateforme
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">
-                    Interface de gestion des utilisateurs en cours de développement
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <UsersManagement />
+          </TabsContent>
+
+          <TabsContent value="owners" className="space-y-6">
+            <OwnersManagement />
           </TabsContent>
 
           <TabsContent value="properties" className="space-y-6">
@@ -279,41 +280,7 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="bookings" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Gestion des Réservations</CardTitle>
-                <CardDescription>
-                  Gérez les réservations et leurs statuts
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">
-                    Interface de gestion des réservations en cours de développement
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="owners" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Gestion des Propriétaires</CardTitle>
-                <CardDescription>
-                  Validez les demandes d'inscription des propriétaires
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <AlertTriangle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">
-                    Interface de gestion des propriétaires en cours de développement
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <BookingsManagement />
           </TabsContent>
         </Tabs>
       </div>

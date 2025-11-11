@@ -39,16 +39,32 @@ export async function GET(request: NextRequest) {
       .select('-password')
       .sort({ createdAt: -1 });
 
-    // Pour chaque propriétaire, compter le nombre de propriétés
-    const ownersWithStats = await Promise.all(
-      owners.map(async (owner) => {
-        const propertyCount = await Property.countDocuments({ owner: owner._id });
-        return {
-          ...owner.toObject(),
-          propertyCount
-        };
-      })
+    // Récupérer les IDs des propriétaires
+    const ownerIds = owners.map(owner => owner._id);
+
+    // Compter les propriétés pour tous les propriétaires en une seule agrégation (évite N+1)
+    const propertyCounts = await Property.aggregate([
+      {
+        $match: { owner: { $in: ownerIds } }
+      },
+      {
+        $group: {
+          _id: '$owner',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Créer un Map pour un accès rapide aux counts
+    const propertyCountMap = new Map(
+      propertyCounts.map(item => [item._id.toString(), item.count])
     );
+
+    // Ajouter le count à chaque propriétaire
+    const ownersWithStats = owners.map(owner => ({
+      ...owner.toObject(),
+      propertyCount: propertyCountMap.get(owner._id.toString()) || 0
+    }));
 
     return NextResponse.json(ownersWithStats);
   } catch (error) {

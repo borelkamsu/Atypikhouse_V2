@@ -9,31 +9,37 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Eye, ToggleLeft, ToggleRight, Home, MapPin, Star, Users, Edit, Trash } from 'lucide-react';
+import { Search, Eye, ToggleLeft, ToggleRight, Home, MapPin, Users } from 'lucide-react';
 
 interface Property {
   _id: string;
-  name: string;
+  title: string;
   description: string;
   type: string;
-  price: number;
-  location: string;
-  address: string;
-  maxGuests: number;
-  bedrooms: number;
-  bathrooms: number;
-  ownerId: string;
+  price: {
+    perNight: number;
+    currency: string;
+  };
+  location: {
+    city: string;
+    address: string;
+    country: string;
+  };
+  capacity: {
+    guests: number;
+    bedrooms: number;
+    bathrooms: number;
+  };
+  owner: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    companyName?: string;
+  };
+  isAvailable: boolean;
   createdAt: string;
-  featured: boolean;
-  isActive?: boolean;
   images?: Array<{ url: string; publicId: string }>;
-}
-
-interface Owner {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
 }
 
 export function PropertiesManagement() {
@@ -42,19 +48,43 @@ export function PropertiesManagement() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
-  const [owners, setOwners] = useState<Owner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchProperties();
-    fetchOwners();
-  }, []);
+  }, [typeFilter, statusFilter]);
 
   const fetchProperties = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/properties');
+      const params = new URLSearchParams();
+      
+      if (typeFilter !== 'all') {
+        params.append('type', typeFilter);
+      }
+      if (statusFilter !== 'all') {
+        params.append('status', statusFilter);
+      }
+      if (searchTerm) {
+        params.append('search', searchTerm);
+      }
+
+      const response = await fetch(`/api/admin/properties?${params}`);
+      
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          toast({
+            title: "Non autorisé",
+            description: "Vous devez être connecté en tant qu'administrateur",
+            variant: "destructive",
+          });
+          window.location.href = '/admin/login';
+          return;
+        }
+        throw new Error('Erreur lors du chargement des propriétés');
+      }
+
       const data = await response.json();
       setProperties(data || []);
     } catch (error) {
@@ -69,35 +99,29 @@ export function PropertiesManagement() {
     }
   };
 
-  const fetchOwners = async () => {
+  const togglePropertyStatus = async (propertyId: string, currentStatus: boolean) => {
     try {
-      const response = await fetch('/api/users?role=owner');
-      const data = await response.json();
-      setOwners(data || []);
-    } catch (error) {
-      console.error('Erreur lors du chargement des propriétaires:', error);
-    }
-  };
-
-  const togglePropertyStatus = async (propertyId: string, isActive: boolean) => {
-    try {
-      const response = await fetch(`/api/admin/properties/${propertyId}/toggle-status`, {
-        method: 'PUT',
+      const response = await fetch(`/api/admin/properties`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ isActive }),
+        body: JSON.stringify({ propertyId, isAvailable: !currentStatus }),
       });
 
-      if (response.ok) {
-        toast({
-          title: isActive ? "Propriété activée" : "Propriété désactivée",
-          description: isActive ? "La propriété est maintenant visible" : "La propriété n'est plus visible",
-        });
-        fetchProperties();
-      } else {
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          window.location.href = '/admin/login';
+          return;
+        }
         throw new Error('Erreur lors du changement de statut');
       }
+
+      toast({
+        title: !currentStatus ? "Propriété activée" : "Propriété désactivée",
+        description: !currentStatus ? "La propriété est maintenant visible" : "La propriété n'est plus visible",
+      });
+      fetchProperties();
     } catch (error) {
       toast({
         title: "Erreur",
@@ -107,78 +131,17 @@ export function PropertiesManagement() {
     }
   };
 
-  const toggleFeatured = async (propertyId: string, featured: boolean) => {
-    try {
-      const response = await fetch(`/api/admin/properties/${propertyId}/toggle-featured`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ featured }),
-      });
-
-      if (response.ok) {
-        toast({
-          title: featured ? "Propriété mise en avant" : "Propriété retirée de la mise en avant",
-          description: featured ? "La propriété apparaît maintenant en vedette" : "La propriété n'apparaît plus en vedette",
-        });
-        fetchProperties();
-      } else {
-        throw new Error('Erreur lors du changement de statut vedette');
-      }
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de changer le statut de vedette",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const deleteProperty = async (propertyId: string) => {
-    try {
-      const response = await fetch(`/api/admin/properties/${propertyId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Propriété supprimée",
-          description: "La propriété a été supprimée avec succès",
-        });
-        fetchProperties();
-      } else {
-        throw new Error('Erreur lors de la suppression');
-      }
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la propriété",
-        variant: "destructive",
-      });
-    }
-  };
-
   const getTypeLabel = (type: string) => {
     const typeLabels: { [key: string]: string } = {
-      treehouse: "Cabane dans les arbres",
       cabin: "Cabane",
       yurt: "Yourte",
-      tent: "Tente de luxe",
-      houseboat: "Maison flottante",
-      cave: "Maison troglodyte",
-      castle: "Château",
-      farmhouse: "Ferme",
-      villa: "Villa",
-      apartment: "Appartement",
+      floating: "Maison flottante",
+      dome: "Dôme",
+      caravan: "Caravane",
+      igloo: "Igloo",
       other: "Autre"
     };
     return typeLabels[type] || type;
-  };
-
-  const getOwnerName = (ownerId: string) => {
-    const owner = owners.find(o => o._id === ownerId);
-    return owner ? `${owner.firstName} ${owner.lastName}` : 'Propriétaire inconnu';
   };
 
   const formatPrice = (price: number) => {
@@ -192,20 +155,20 @@ export function PropertiesManagement() {
     return new Date(date).toLocaleDateString('fr-FR');
   };
 
-  // Filtrage des propriétés
+  // Filtrage des propriétés côté client pour le search term
   const filteredProperties = properties.filter(property => {
-    const matchesSearch = property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         getOwnerName(property.ownerId).toLowerCase().includes(searchTerm.toLowerCase());
+    if (!searchTerm) return true;
     
-    const matchesType = typeFilter === "all" || property.type === typeFilter;
-    const matchesStatus = statusFilter === "all" || 
-                         (statusFilter === "active" && property.isActive !== false) ||
-                         (statusFilter === "inactive" && property.isActive === false) ||
-                         (statusFilter === "featured" && property.featured);
-
-    return matchesSearch && matchesType && matchesStatus;
+    const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         property.location.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         `${property.owner.firstName} ${property.owner.lastName}`.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesSearch;
   });
+
+  const handleSearch = () => {
+    fetchProperties();
+  };
 
   if (isLoading) {
     return (
@@ -224,46 +187,43 @@ export function PropertiesManagement() {
           <CardTitle>Filtres et recherche</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Rechercher par nom, lieu ou propriétaire..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 className="pl-10"
+                data-testid="input-search-properties"
               />
             </div>
             
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger>
+              <SelectTrigger data-testid="select-type-filter">
                 <SelectValue placeholder="Type d'hébergement" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous les types</SelectItem>
-                <SelectItem value="treehouse">Cabane dans les arbres</SelectItem>
                 <SelectItem value="cabin">Cabane</SelectItem>
                 <SelectItem value="yurt">Yourte</SelectItem>
-                <SelectItem value="tent">Tente de luxe</SelectItem>
-                <SelectItem value="houseboat">Maison flottante</SelectItem>
-                <SelectItem value="cave">Maison troglodyte</SelectItem>
-                <SelectItem value="castle">Château</SelectItem>
-                <SelectItem value="farmhouse">Ferme</SelectItem>
-                <SelectItem value="villa">Villa</SelectItem>
-                <SelectItem value="apartment">Appartement</SelectItem>
+                <SelectItem value="floating">Maison flottante</SelectItem>
+                <SelectItem value="dome">Dôme</SelectItem>
+                <SelectItem value="caravan">Caravane</SelectItem>
+                <SelectItem value="igloo">Igloo</SelectItem>
                 <SelectItem value="other">Autre</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
+              <SelectTrigger data-testid="select-status-filter">
                 <SelectValue placeholder="Statut" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="active">Actives</SelectItem>
-                <SelectItem value="inactive">Inactives</SelectItem>
-                <SelectItem value="featured">En vedette</SelectItem>
+                <SelectItem value="available">Disponibles</SelectItem>
+                <SelectItem value="unavailable">Non disponibles</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -271,10 +231,10 @@ export function PropertiesManagement() {
       </Card>
 
       {/* Statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl">{properties.length}</CardTitle>
+            <CardTitle className="text-2xl" data-testid="stat-total">{properties.length}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600">Total propriétés</p>
@@ -283,32 +243,23 @@ export function PropertiesManagement() {
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl">
-              {properties.filter(p => p.isActive !== false).length}
+            <CardTitle className="text-2xl" data-testid="stat-available">
+              {properties.filter(p => p.isAvailable).length}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600">Actives</p>
+            <p className="text-gray-600">Disponibles</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl">
-              {properties.filter(p => p.featured).length}
+            <CardTitle className="text-2xl" data-testid="stat-unavailable">
+              {properties.filter(p => !p.isAvailable).length}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600">En vedette</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-2xl">{owners.length}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">Propriétaires</p>
+            <p className="text-gray-600">Non disponibles</p>
           </CardContent>
         </Card>
       </div>
@@ -328,38 +279,40 @@ export function PropertiesManagement() {
                   <TableHead>Type</TableHead>
                   <TableHead>Prix</TableHead>
                   <TableHead>Localisation</TableHead>
+                  <TableHead>Capacité</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead>Créée le</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredProperties.map((property) => (
-                  <TableRow key={property._id}>
+                  <TableRow key={property._id} data-testid={`row-property-${property._id}`}>
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
                           {property.images && property.images.length > 0 ? (
                             <img
                               src={property.images[0].url}
-                              alt={property.name}
+                              alt={property.title}
                               className="w-full h-full object-cover rounded-lg"
                             />
                           ) : (
                             <Home className="h-6 w-6 text-gray-400" />
                           )}
                         </div>
-                        <div>
-                          <p className="font-medium">{property.name}</p>
-                          <div className="flex items-center text-sm text-gray-500">
-                            <Users className="h-4 w-4 mr-1" />
-                            {property.maxGuests} invités
-                          </div>
-                        </div>
+                        <p className="font-medium">{property.title}</p>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <p className="text-sm">{getOwnerName(property.ownerId)}</p>
+                      <div>
+                        <p className="text-sm font-medium">
+                          {property.owner.firstName} {property.owner.lastName}
+                        </p>
+                        {property.owner.companyName && (
+                          <p className="text-xs text-gray-500">{property.owner.companyName}</p>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">
@@ -367,41 +320,39 @@ export function PropertiesManagement() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <p className="font-medium">{formatPrice(property.price)}/nuit</p>
+                      <p className="font-medium">{formatPrice(property.price.perNight)}/nuit</p>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center text-sm">
                         <MapPin className="h-4 w-4 mr-1 text-gray-400" />
-                        {property.location}
+                        {property.location.city}, {property.location.country}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex space-x-1">
-                        {property.featured && (
-                          <Badge className="bg-yellow-100 text-yellow-800">
-                            <Star className="h-3 w-3 mr-1" />
-                            Vedette
-                          </Badge>
-                        )}
-                        <Badge variant={property.isActive !== false ? "default" : "secondary"}>
-                          {property.isActive !== false ? "Active" : "Inactive"}
-                        </Badge>
+                      <div className="flex items-center text-sm">
+                        <Users className="h-4 w-4 mr-1 text-gray-400" />
+                        {property.capacity.guests} invités
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={property.isAvailable ? "default" : "secondary"} data-testid={`badge-status-${property._id}`}>
+                        {property.isAvailable ? "Disponible" : "Non disponible"}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <p className="text-sm text-gray-600">{formatDate(property.createdAt)}</p>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
+                    <TableCell className="text-right">
+                      <div className="flex gap-2 justify-end">
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={() => setSelectedProperty(property)}>
+                            <Button variant="outline" size="sm" onClick={() => setSelectedProperty(property)} data-testid={`button-view-${property._id}`}>
                               <Eye className="h-4 w-4" />
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
+                          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                             <DialogHeader>
-                              <DialogTitle>{selectedProperty?.name}</DialogTitle>
+                              <DialogTitle>{selectedProperty?.title}</DialogTitle>
                             </DialogHeader>
                             {selectedProperty && (
                               <div className="space-y-4">
@@ -412,15 +363,15 @@ export function PropertiesManagement() {
                                   </div>
                                   <div>
                                     <p className="font-medium">Prix</p>
-                                    <p>{formatPrice(selectedProperty.price)}/nuit</p>
+                                    <p>{formatPrice(selectedProperty.price.perNight)}/nuit</p>
                                   </div>
                                   <div>
                                     <p className="font-medium">Capacité</p>
-                                    <p>{selectedProperty.maxGuests} invités</p>
+                                    <p>{selectedProperty.capacity.guests} invités</p>
                                   </div>
                                   <div>
                                     <p className="font-medium">Chambres/SDB</p>
-                                    <p>{selectedProperty.bedrooms} chambres, {selectedProperty.bathrooms} SDB</p>
+                                    <p>{selectedProperty.capacity.bedrooms} chambres, {selectedProperty.capacity.bathrooms} SDB</p>
                                   </div>
                                 </div>
                                 <div>
@@ -429,11 +380,18 @@ export function PropertiesManagement() {
                                 </div>
                                 <div>
                                   <p className="font-medium">Adresse</p>
-                                  <p className="text-sm text-gray-600">{selectedProperty.address}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {selectedProperty.location.address}, {selectedProperty.location.city}, {selectedProperty.location.country}
+                                  </p>
                                 </div>
                                 <div>
                                   <p className="font-medium">Propriétaire</p>
-                                  <p className="text-sm text-gray-600">{getOwnerName(selectedProperty.ownerId)}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {selectedProperty.owner.firstName} {selectedProperty.owner.lastName}
+                                  </p>
+                                  {selectedProperty.owner.companyName && (
+                                    <p className="text-sm text-gray-500">{selectedProperty.owner.companyName}</p>
+                                  )}
                                 </div>
                               </div>
                             )}
@@ -441,32 +399,22 @@ export function PropertiesManagement() {
                         </Dialog>
                         
                         <Button
-                          variant="outline"
+                          variant={property.isAvailable ? "destructive" : "default"}
                           size="sm"
-                          onClick={() => togglePropertyStatus(property._id, !property.isActive)}
+                          onClick={() => togglePropertyStatus(property._id, property.isAvailable)}
+                          data-testid={`button-toggle-${property._id}`}
                         >
-                          {property.isActive !== false ? (
-                            <ToggleRight className="h-4 w-4 text-green-600" />
+                          {property.isAvailable ? (
+                            <>
+                              <ToggleRight className="h-4 w-4 mr-1" />
+                              Désactiver
+                            </>
                           ) : (
-                            <ToggleLeft className="h-4 w-4 text-gray-400" />
+                            <>
+                              <ToggleLeft className="h-4 w-4 mr-1" />
+                              Activer
+                            </>
                           )}
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => toggleFeatured(property._id, !property.featured)}
-                        >
-                          <Star className={`h-4 w-4 ${property.featured ? 'text-yellow-500 fill-current' : 'text-gray-400'}`} />
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => deleteProperty(property._id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>

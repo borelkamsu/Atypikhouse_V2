@@ -35,7 +35,7 @@ interface Property {
   capacity: {
     guests: number;
   };
-  images: string[];
+  images: Array<{ url: string; publicId: string }>;
   rating: number;
   isAvailable: boolean;
   createdAt: string;
@@ -339,7 +339,7 @@ export default function OwnerDashboard() {
                     <div key={property._id} className="flex items-center space-x-4 p-4 border rounded-lg">
                       {property.images.length > 0 && (
                         <img
-                          src={property.images[0]}
+                          src={property.images[0].url}
                           alt={property.title}
                           className="w-16 h-16 object-cover rounded-lg"
                         />

@@ -23,7 +23,7 @@ export interface IProperty extends mongoose.Document {
     bathrooms: number;
   };
   amenities: string[];
-  images: string[];
+  images: Array<{ url: string; publicId: string }>;
   owner: mongoose.Types.ObjectId;
   isAvailable: boolean;
   rating: number;
@@ -102,8 +102,14 @@ const propertySchema = new mongoose.Schema<IProperty>({
     trim: true
   }],
   images: [{
-    type: String,
-    required: [true, 'Au moins une image est requise']
+    url: {
+      type: String,
+      required: false
+    },
+    publicId: {
+      type: String,
+      required: false
+    }
   }],
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -128,7 +134,6 @@ const propertySchema = new mongoose.Schema<IProperty>({
   timestamps: true
 });
 
-// Index pour améliorer les performances
 propertySchema.index({ type: 1 });
 propertySchema.index({ 'location.city': 1 });
 propertySchema.index({ owner: 1 });
@@ -136,5 +141,3 @@ propertySchema.index({ isAvailable: 1 });
 propertySchema.index({ rating: -1 });
 
 export const Property = mongoose.models.Property || mongoose.model<IProperty>('Property', propertySchema);
-
-

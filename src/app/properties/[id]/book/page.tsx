@@ -199,7 +199,7 @@ export default function BookPropertyPage() {
               <Card>
                 <CardContent className="p-0">
                   <img
-                    src={property.images[0]}
+                    src={property.images[0].url}
                     alt={property.title}
                     className="w-full h-64 object-cover rounded-lg"
                   />

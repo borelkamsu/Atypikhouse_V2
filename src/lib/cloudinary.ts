@@ -9,7 +9,7 @@ cloudinary.config({
 
 export default cloudinary;
 
-export async function uploadImage(file: File): Promise<string> {
+export async function uploadImage(file: File): Promise<{ url: string; publicId: string }> {
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
   
@@ -24,7 +24,7 @@ export async function uploadImage(file: File): Promise<string> {
       },
       (error, result) => {
         if (error) reject(error);
-        else if (result) resolve(result.secure_url);
+        else if (result) resolve({ url: result.secure_url, publicId: result.public_id });
         else reject(new Error('Upload failed'));
       }
     ).end(buffer);

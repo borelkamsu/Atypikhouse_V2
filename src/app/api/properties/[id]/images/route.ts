@@ -39,14 +39,15 @@ export async function POST(
 
     // Upload vers Cloudinary
     const uploadPromises = files.map(file => uploadImage(file));
-    const imageUrls = await Promise.all(uploadPromises);
+    const imageObjects = await Promise.all(uploadPromises);
 
-    // Ajouter les URLs aux images existantes
-    property.images = [...property.images, ...imageUrls];
+    // Ajouter les objets {url, publicId} aux images existantes
+    property.images = [...property.images, ...imageObjects];
     await property.save();
 
     return NextResponse.json({
       message: 'Images uploadées avec succès',
+      imageCount: imageObjects.length,
       property
     });
 

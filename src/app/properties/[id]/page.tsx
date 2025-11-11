@@ -85,7 +85,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             <>
               <div className="md:row-span-2">
                 <img
-                  src={property.images[0]}
+                  src={property.images[0].url}
                   alt={property.title}
                   className="w-full h-full object-cover"
                   data-testid="img-property-main"
@@ -94,7 +94,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               {property.images.slice(1, 5).map((image, index) => (
                 <div key={index} className="h-48 md:h-auto">
                   <img
-                    src={image}
+                    src={image.url}
                     alt={`${property.title} - ${index + 2}`}
                     className="w-full h-full object-cover"
                     data-testid={`img-property-${index + 1}`}

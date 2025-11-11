@@ -26,7 +26,7 @@ interface Property {
   createdAt: string;
   featured: boolean;
   isActive?: boolean;
-  images?: string[];
+  images?: Array<{ url: string; publicId: string }>;
 }
 
 interface Owner {
@@ -341,7 +341,7 @@ export function PropertiesManagement() {
                         <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
                           {property.images && property.images.length > 0 ? (
                             <img
-                              src={property.images[0]}
+                              src={property.images[0].url}
                               alt={property.name}
                               className="w-full h-full object-cover rounded-lg"
                             />

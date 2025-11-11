@@ -40,7 +40,7 @@ export interface Property {
     bathrooms: number
   }
   amenities: string[]
-  images: string[]
+  images: Array<{ url: string; publicId: string }>
   rating: number
   isAvailable: boolean
   owner: {

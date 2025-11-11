@@ -88,9 +88,9 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
                 <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full">
                   {/* Image */}
                   <div className="relative h-64 bg-gray-200">
-                    {property.images && property.images.length > 0 ? (
+                    {property.images && property.images.length > 0 && property.images[0]?.url ? (
                       <img
-                        src={property.images[0]}
+                        src={property.images[0].url}
                         alt={property.title}
                         className="w-full h-full object-cover"
                         data-testid={`img-property-${property._id}`}

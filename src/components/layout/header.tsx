@@ -5,12 +5,14 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Menu, X, User, Heart, Search, Building, Shield, LogOut } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
   const router = useRouter()
   const location = usePathname()
+  const { toast } = useToast()
 
   useEffect(() => {
     fetchUser()
@@ -36,6 +38,17 @@ export default function Header() {
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error)
     }
+  }
+
+  const handleGuestFavoriteClick = () => {
+    toast({
+      title: 'Connexion requise',
+      description: 'Vous devez être connecté pour accéder aux favoris',
+      variant: 'destructive',
+    })
+    setTimeout(() => {
+      router.push('/login')
+    }, 1500)
   }
 
   return (
@@ -72,13 +85,15 @@ export default function Header() {
             >
               Habitations
             </Link>
-            <Link 
-              href="/host" 
-              className={`font-medium transition-colors ${location === '/host' ? "text-primary" : "text-gray-800 hover:text-primary"}`}
-              data-testid="link-host"
-            >
-              Devenir propriétaire
-            </Link>
+            {user?.role !== 'owner' && (
+              <Link 
+                href="/host" 
+                className={`font-medium transition-colors ${location === '/host' ? "text-primary" : "text-gray-800 hover:text-primary"}`}
+                data-testid="link-host"
+              >
+                Devenir propriétaire
+              </Link>
+            )}
             <a 
               href="#about" 
               className="font-medium text-gray-800 hover:text-primary transition-colors"
@@ -89,15 +104,6 @@ export default function Header() {
 
           {/* Actions Desktop - Visibles sur grand écran */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-3">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-gray-700 hover:text-primary"
-              data-testid="button-search"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-            
             {user ? (
               <Link href="/favorites">
                 <Button 
@@ -114,6 +120,7 @@ export default function Header() {
                 variant="ghost" 
                 size="icon" 
                 className="text-gray-700 hover:text-primary"
+                onClick={handleGuestFavoriteClick}
                 data-testid="button-favorites"
               >
                 <Heart className="h-5 w-5" />
@@ -230,14 +237,16 @@ export default function Header() {
               >
                 Habitations
               </Link>
-              <Link 
-                href="/host" 
-                className={`text-gray-700 hover:text-primary transition-colors py-2 ${location === '/host' ? 'text-primary font-medium' : ''}`}
-                onClick={() => setIsMenuOpen(false)}
-                data-testid="mobile-link-host"
-              >
-                Devenir propriétaire
-              </Link>
+              {user?.role !== 'owner' && (
+                <Link 
+                  href="/host" 
+                  className={`text-gray-700 hover:text-primary transition-colors py-2 ${location === '/host' ? 'text-primary font-medium' : ''}`}
+                  onClick={() => setIsMenuOpen(false)}
+                  data-testid="mobile-link-host"
+                >
+                  Devenir propriétaire
+                </Link>
+              )}
               <a 
                 href="#about" 
                 className="text-gray-700 hover:text-primary transition-colors py-2"
@@ -251,9 +260,6 @@ export default function Header() {
                 {user ? (
                   <>
                     <div className="flex items-center gap-2 pb-2">
-                      <Button variant="ghost" size="icon" className="text-gray-700">
-                        <Search className="h-5 w-5" />
-                      </Button>
                       <Link href="/favorites" onClick={() => setIsMenuOpen(false)}>
                         <Button variant="ghost" size="icon" className="text-gray-700">
                           <Heart className="h-5 w-5" />
@@ -313,10 +319,13 @@ export default function Header() {
                 ) : (
                   <>
                     <div className="flex items-center gap-2 pb-2">
-                      <Button variant="ghost" size="icon" className="text-gray-700">
-                        <Search className="h-5 w-5" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="text-gray-700">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-gray-700"
+                        onClick={handleGuestFavoriteClick}
+                        data-testid="mobile-button-favorites"
+                      >
                         <Heart className="h-5 w-5" />
                       </Button>
                     </div>

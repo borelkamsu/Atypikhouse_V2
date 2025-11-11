@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Star, MapPin, Users } from 'lucide-react'
 import { getProperties, type Property } from '@/lib/server/properties'
 import FiltersWrapper from '@/components/properties/filters-wrapper'
+import { FavoriteButton } from '@/components/property/favorite-button'
 
 interface PageProps {
   searchParams: {
@@ -116,6 +117,9 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
                         </Badge>
                       </div>
                     )}
+                    
+                    {/* Bouton Favori */}
+                    <FavoriteButton propertyId={property._id} className={!property.isAvailable ? "top-16" : ""} />
                   </div>
 
                   <CardContent className="p-5">

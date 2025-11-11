@@ -6,6 +6,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FavoriteButton } from '@/components/property/favorite-button';
 
+// Forcer le rendu dynamique pour éviter l'erreur clientReferenceManifest
+export const dynamic = 'force-dynamic';
+
 // Types pour les données
 interface Property {
   _id: string;

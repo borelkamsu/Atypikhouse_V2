@@ -1,0 +1,112 @@
+    at i.with (.next/server/chunks/4586.js:22:22822)
+    at i.startActiveSpan (.next/server/chunks/4586.js:22:37788)
+    at e.startActiveSpan (.next/server/chunks/4586.js:22:38322)
+    at <unknown> (.next/server/chunks/4586.js:15:4109)
+    at e.with (.next/server/chunks/4586.js:22:28575)
+    at i.with (.next/server/chunks/4586.js:22:22822) {
+  description: "Route / couldn't be rendered statically because it used no-store fetch http://localhost:5000/api/properties/categories /. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (11/45) 
+   Generating static pages (22/45) 
+   Generating static pages (33/45) 
+(node:457) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:457) [MONGOOSE] Warning: Duplicate schema index on {"name":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+ ✓ Generating static pages (45/45)
+   Finalizing page optimization ...
+   Collecting build traces ...
+Route (app)                                  Size  First Load JS
+┌ ƒ /                                     7.47 kB         121 kB
+├ ○ /_not-found                             998 B         103 kB
+├ ○ /admin                                10.8 kB         156 kB
+├ ○ /admin/dashboard                      4.76 kB         115 kB
+├ ○ /admin/login                          3.27 kB         137 kB
+├ ○ /admin/owners                         3.92 kB         149 kB
+├ ○ /admin/properties                     2.17 kB         112 kB
+├ ƒ /api/admin/bookings                     210 B         102 kB
+├ ƒ /api/admin/clean-properties             210 B         102 kB
+├ ƒ /api/admin/create-admin                 210 B         102 kB
+├ ƒ /api/admin/hosts                        210 B         102 kB
+├ ƒ /api/admin/hosts/[id]/approve           210 B         102 kB
+├ ƒ /api/admin/hosts/[id]/reject            210 B         102 kB
+├ ƒ /api/admin/owners                       210 B         102 kB
+├ ƒ /api/admin/owners/[id]/approve          210 B         102 kB
+├ ƒ /api/admin/owners/[id]/reject           210 B         102 kB
+├ ƒ /api/admin/owners/[id]/toggle-status    210 B         102 kB
+├ ƒ /api/admin/properties                   210 B         102 kB
+├ ƒ /api/admin/stats                        210 B         102 kB
+├ ƒ /api/admin/users                        210 B         102 kB
+├ ƒ /api/admin/users/[id]                   210 B         102 kB
+├ ƒ /api/amenities                          210 B         102 kB
+├ ƒ /api/auth/login                         210 B         102 kB
+├ ƒ /api/auth/logout                        210 B         102 kB
+├ ƒ /api/auth/me                            210 B         102 kB
+├ ƒ /api/auth/register                      210 B         102 kB
+├ ƒ /api/bookings                           210 B         102 kB
+├ ƒ /api/bookings/[id]                      210 B         102 kB
+├ ƒ /api/favorites                          210 B         102 kB
+├ ƒ /api/favorites/[propertyId]             210 B         102 kB
+├ ƒ /api/health                             210 B         102 kB
+├ ƒ /api/hosts/register                     210 B         102 kB
+├ ƒ /api/properties                         210 B         102 kB
+├ ƒ /api/properties/[id]                    210 B         102 kB
+├ ƒ /api/properties/[id]/images             210 B         102 kB
+├ ƒ /api/properties/categories              210 B         102 kB
+├ ƒ /api/properties/featured                210 B         102 kB
+├ ƒ /api/upload                             210 B         102 kB
+├ ○ /auth                                 8.69 kB         170 kB
+├ ○ /become-host                            130 B         139 kB
+├ ○ /bookings                             4.58 kB         114 kB
+├ ○ /dashboard                            6.05 kB         116 kB
+├ ○ /favorites                            4.24 kB         114 kB
+├ ○ /host                                   130 B         139 kB
+├ ○ /host/register                        7.37 kB         129 kB
+├ ○ /login                                4.17 kB         114 kB
+├ ƒ /owner/dashboard                      2.76 kB         117 kB
+├ ƒ /owner/properties/[id]/edit           4.35 kB         118 kB
+├ ○ /owner/properties/new                 6.55 kB         145 kB
+├ ƒ /properties                           3.44 kB         117 kB
+├ ƒ /properties/[id]                      4.65 kB         114 kB
+├ ƒ /properties/[id]/book                    5 kB         115 kB
+├ ○ /properties/create                    9.26 kB         171 kB
+├ ○ /register                             8.28 kB         122 kB
+└ ○ /setup-admin                          3.29 kB         113 kB
++ First Load JS shared by all              102 kB
+  ├ chunks/1255-20045df290cc858c.js       45.7 kB
+  ├ chunks/4bd1b696-f785427dddbba9fb.js   54.2 kB
+  └ other shared chunks (total)           2.05 kB
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+==> Uploading build...
+==> Uploaded in 8.5s. Compression took 7.1s
+==> Build successful 🎉
+==> Deploying...
+==> Running 'npm run start'
+> atypick-ssr@0.1.0 start
+> next start
+   ▲ Next.js 15.5.0
+   - Local:        http://localhost:10000
+   - Network:      http://10.16.15.122:10000
+ ✓ Starting...
+==> Your service is live 🎉
+ ✓ Ready in 1777ms
+ ⨯ Error [InvariantError]: Invariant: Expected clientReferenceManifest to be defined. This is a bug in Next.js.
+    at k (.next/server/app/(main)/page.js:1:4352)
+    at m (.next/server/app/(main)/page.js:1:6983)
+    at o (.next/server/app/(main)/page.js:2:1779)
+    at responseGenerator (.next/server/app/(main)/page.js:2:1917)
+ ⨯ Error [InvariantError]: Invariant: Expected clientReferenceManifest to be defined. This is a bug in Next.js.
+    at k (.next/server/app/(main)/page.js:1:4352)
+    at m (.next/server/app/(main)/page.js:1:6983)
+    at o (.next/server/app/(main)/page.js:2:1779)
+    at responseGenerator (.next/server/app/(main)/page.js:2:1917)
+==> 
+==> ///////////////////////////////////////////////////////////
+==> 
+==> Available at your primary URL https://atypikhouse-v2.onrender.com
+==> 
+==> ///////////////////////////////////////////////////////////
+(node:87) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87) [MONGOOSE] Warning: Duplicate schema index on {"name":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.

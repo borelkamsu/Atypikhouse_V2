@@ -20,6 +20,7 @@ export function BookingActions({ bookingId }: BookingActionsProps) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ 
           status: action === 'confirm' ? 'confirmed' : 'cancelled' 
         }),

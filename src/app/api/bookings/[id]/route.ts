@@ -19,7 +19,7 @@ export async function GET(
 
     const booking = await Booking.findById(params.id)
       .populate('userId', 'firstName lastName email')
-      .populate('propertyId', 'title location price images ownerId');
+      .populate('propertyId', 'title location price images owner');
 
     if (!booking) {
       return NextResponse.json({ message: 'Réservation non trouvée' }, { status: 404 });
@@ -27,7 +27,7 @@ export async function GET(
 
     // Vérifier que l'utilisateur peut voir cette réservation
     const bookingUserId = booking.userId.toString();
-    const propertyOwnerId = booking.propertyId?.ownerId?.toString();
+    const propertyOwnerId = booking.propertyId?.owner?.toString();
     
     if (bookingUserId !== token.userId && propertyOwnerId !== token.userId && token.role !== 'admin') {
       return NextResponse.json({ message: 'Accès non autorisé' }, { status: 403 });
@@ -64,7 +64,7 @@ export async function PATCH(
     }
 
     const booking = await Booking.findById(params.id)
-      .populate('propertyId', 'ownerId');
+      .populate('propertyId', 'owner');
 
     if (!booking) {
       return NextResponse.json({ message: 'Réservation non trouvée' }, { status: 404 });
@@ -72,7 +72,7 @@ export async function PATCH(
 
     // Vérifier les permissions
     const bookingUserId = booking.userId.toString();
-    const propertyOwnerId = booking.propertyId?.ownerId?.toString();
+    const propertyOwnerId = booking.propertyId?.owner?.toString();
     const isOwner = propertyOwnerId === token.userId;
     const isClient = bookingUserId === token.userId;
     const isAdmin = token.role === 'admin';

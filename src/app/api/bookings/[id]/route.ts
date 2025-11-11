@@ -27,7 +27,7 @@ export async function GET(
 
     // Vérifier que l'utilisateur peut voir cette réservation
     const bookingUserId = booking.userId.toString();
-    const propertyOwnerId = booking.propertyId.ownerId?.toString();
+    const propertyOwnerId = booking.propertyId?.ownerId?.toString();
     
     if (bookingUserId !== token.userId && propertyOwnerId !== token.userId && token.role !== 'admin') {
       return NextResponse.json({ message: 'Accès non autorisé' }, { status: 403 });
@@ -65,7 +65,7 @@ export async function PATCH(
 
     // Vérifier les permissions
     const bookingUserId = booking.userId.toString();
-    const propertyOwnerId = booking.propertyId.ownerId?.toString();
+    const propertyOwnerId = booking.propertyId?.ownerId?.toString();
     
     if (bookingUserId !== token.userId && propertyOwnerId !== token.userId && token.role !== 'admin') {
       return NextResponse.json({ message: 'Vous n\'avez pas la permission d\'annuler cette réservation' }, { status: 403 });

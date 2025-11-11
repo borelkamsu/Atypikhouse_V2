@@ -39,6 +39,10 @@ export default async function OwnerDashboard() {
     redirect('/login');
   }
 
+  if (!decoded) {
+    redirect('/login');
+  }
+
   // Charger les données côté serveur
   const properties = await getOwnerProperties(decoded.userId);
   const bookings = await getOwnerBookings(decoded.userId);

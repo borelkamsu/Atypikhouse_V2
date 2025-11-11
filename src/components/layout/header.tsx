@@ -45,7 +45,7 @@ export default function Header() {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <img src="/images/logo.svg" alt="AtypikHouse Logo" className="h-8 mr-2" />
+              <img src="/images/logo.jpeg" alt="AtypikHouse Logo" className="h-12 mr-2 rounded" />
               <span className="font-heading font-bold text-xl text-primary">AtypikHouse</span>
             </Link>
           </div>

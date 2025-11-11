@@ -1,0 +1,35 @@
+  ▲ Next.js 15.5.0
+   - Local:        http://localhost:10000
+   - Network:      http://10.17.149.218:10000
+ ✓ Starting...
+ ✓ Ready in 1689ms
+ ⨯ Error [InvariantError]: Invariant: Expected clientReferenceManifest to be defined. This is a bug in Next.js.
+    at k (.next/server/app/(main)/page.js:1:4352)
+    at m (.next/server/app/(main)/page.js:1:6983)
+    at o (.next/server/app/(main)/page.js:2:1779)
+    at responseGenerator (.next/server/app/(main)/page.js:2:1917)
+ ⨯ Error [InvariantError]: Invariant: Expected clientReferenceManifest to be defined. This is a bug in Next.js.
+    at k (.next/server/app/(main)/page.js:1:4352)
+    at m (.next/server/app/(main)/page.js:1:6983)
+    at o (.next/server/app/(main)/page.js:2:1779)
+    at responseGenerator (.next/server/app/(main)/page.js:2:1917)
+(node:86) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86) [MONGOOSE] Warning: Duplicate schema index on {"name":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+==> Your service is live 🎉
+==> 
+==> ///////////////////////////////////////////////////////////
+==> 
+==> Available at your primary URL https://atypikhouse-v2.onrender.com
+==> 
+==> ///////////////////////////////////////////////////////////
+ ⨯ Error [InvariantError]: Invariant: Expected clientReferenceManifest to be defined. This is a bug in Next.js.
+    at k (.next/server/app/(main)/page.js:1:4352)
+    at m (.next/server/app/(main)/page.js:1:6983)
+    at o (.next/server/app/(main)/page.js:2:1779)
+    at responseGenerator (.next/server/app/(main)/page.js:2:1917)
+ ⨯ Error [InvariantError]: Invariant: Expected clientReferenceManifest to be defined. This is a bug in Next.js.
+    at k (.next/server/app/(main)/page.js:1:4352)
+    at m (.next/server/app/(main)/page.js:1:6983)
+    at o (.next/server/app/(main)/page.js:2:1779)
+    at responseGenerator (.next/server/app/(main)/page.js:2:1917)

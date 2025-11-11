@@ -5,9 +5,9 @@ import { Search, MapPin, Calendar, Users, Star, ArrowRight } from 'lucide-react'
 import Link from 'next/link';
 import Image from 'next/image';
 import { FavoriteButton } from '@/components/property/favorite-button';
-import connectDB from '@/lib/db';
-import Property from '@/models/property';
-import Booking from '@/models/booking';
+import connectDB from '@/lib/db/mongodb';
+import { Property } from '@/models/property';
+import { Booking } from '@/models/booking';
 
 // Forcer le rendu dynamique pour éviter l'erreur clientReferenceManifest
 export const dynamic = 'force-dynamic';

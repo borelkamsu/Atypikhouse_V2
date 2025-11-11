@@ -52,13 +52,13 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-6">
-            <Link href="/" className={`font-medium ${location.pathname === '/' ? "text-primary" : "text-gray-800 hover:text-primary"}`}>
+            <Link href="/" className={`font-medium ${location === '/' ? "text-primary" : "text-gray-800 hover:text-primary"}`}>
               Accueil
             </Link>
-            <Link href="/properties" className={`font-medium ${location.pathname === '/properties' ? "text-primary" : "text-gray-800 hover:text-primary"}`}>
+            <Link href="/properties" className={`font-medium ${location === '/properties' ? "text-primary" : "text-gray-800 hover:text-primary"}`}>
               Habitations
             </Link>
-            <Link href="/host" className={`font-medium ${location.pathname === '/host' ? "text-primary" : "text-gray-800 hover:text-primary"}`}>
+            <Link href="/host" className={`font-medium ${location === '/host' ? "text-primary" : "text-gray-800 hover:text-primary"}`}>
               Devenir propriétaire
             </Link>
             <a href="#about" className="font-medium text-gray-800 hover:text-primary">

@@ -73,7 +73,7 @@ export function OwnersManagement() {
   const approveOwner = async (ownerId: string) => {
     try {
       const response = await fetch(`/api/admin/owners/${ownerId}/approve`, {
-        method: 'POST',
+        method: 'PUT',
       });
 
       if (response.ok) {
@@ -98,7 +98,7 @@ export function OwnersManagement() {
   const rejectOwner = async (ownerId: string) => {
     try {
       const response = await fetch(`/api/admin/owners/${ownerId}/reject`, {
-        method: 'POST',
+        method: 'PUT',
       });
 
       if (response.ok) {
@@ -123,7 +123,11 @@ export function OwnersManagement() {
   const toggleOwnerStatus = async (ownerId: string, currentStatus: boolean) => {
     try {
       const response = await fetch(`/api/admin/owners/${ownerId}/toggle-status`, {
-        method: 'POST',
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isActive: !currentStatus }),
       });
 
       if (response.ok) {

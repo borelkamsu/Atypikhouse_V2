@@ -52,13 +52,19 @@ export default function AdminLogin() {
             title: "Connexion réussie",
             description: "Bienvenue dans l'interface d'administration",
           });
-          router.push("/admin");
+          
+          // Utiliser window.location.href pour forcer un rechargement complet
+          // Cela garantit que les cookies sont bien pris en compte
+          setTimeout(() => {
+            window.location.href = "/admin";
+          }, 500);
         } else {
           toast({
             title: "Accès refusé",
             description: "Vous n'avez pas les droits d'administrateur",
             variant: "destructive",
           });
+          setIsLoading(false);
         }
       } else {
         toast({
@@ -66,6 +72,7 @@ export default function AdminLogin() {
           description: result.error || "Email ou mot de passe incorrect",
           variant: "destructive",
         });
+        setIsLoading(false);
       }
     } catch (error: any) {
       console.error("Login error:", error);
@@ -74,7 +81,6 @@ export default function AdminLogin() {
         description: "Une erreur s'est produite lors de la connexion",
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -103,6 +109,7 @@ export default function AdminLogin() {
                 {...register("email")}
                 placeholder="admin@atypikhouse.com"
                 className={errors.email ? "border-red-500" : ""}
+                data-testid="input-email"
               />
               {errors.email && (
                 <p className="text-sm text-red-600">{errors.email.message}</p>
@@ -117,6 +124,7 @@ export default function AdminLogin() {
                 {...register("password")}
                 placeholder="Entrez votre mot de passe"
                 className={errors.password ? "border-red-500" : ""}
+                data-testid="input-password"
               />
               {errors.password && (
                 <p className="text-sm text-red-600">{errors.password.message}</p>
@@ -127,6 +135,7 @@ export default function AdminLogin() {
               type="submit"
               className="w-full"
               disabled={isLoading}
+              data-testid="button-login"
             >
               {isLoading ? (
                 <>
@@ -147,6 +156,7 @@ export default function AdminLogin() {
               variant="link" 
               className="mt-2"
               onClick={() => router.push('/')}
+              data-testid="link-home"
             >
               Retour à l'accueil
             </Button>

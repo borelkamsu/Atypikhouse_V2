@@ -7,7 +7,6 @@ import Link from 'next/link';
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
       <section className="relative py-20 px-4 bg-gradient-to-br from-green-50 to-blue-50">
         <div className="container mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 font-heading">
@@ -19,7 +18,6 @@ export default function Home() {
             et autres habitations atypiques en harmonie avec la nature.
           </p>
           
-          {/* Search Bar */}
           <div className="max-w-2xl mx-auto mb-8">
             <div className="flex flex-col sm:flex-row gap-4 p-4 bg-white rounded-lg shadow-lg">
               <div className="flex-1">
@@ -63,7 +61,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories Section */}
       <section className="py-16 px-4 bg-white">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12 font-heading">
@@ -72,9 +69,6 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="group hover:shadow-xl transition-shadow border-gray-200">
               <CardHeader>
-                <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-2xl">🏠</span>
-                </div>
                 <CardTitle className="font-heading">Cabanes</CardTitle>
                 <CardDescription className="font-body">
                   Dormez dans les arbres et profitez d'une vue imprenable sur la nature.
@@ -84,9 +78,6 @@ export default function Home() {
             
             <Card className="group hover:shadow-xl transition-shadow border-gray-200">
               <CardHeader>
-                <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-2xl">⛺</span>
-                </div>
                 <CardTitle className="font-heading">Yourtes</CardTitle>
                 <CardDescription className="font-body">
                   Expérimentez le confort moderne dans une habitation traditionnelle.
@@ -96,9 +87,6 @@ export default function Home() {
             
             <Card className="group hover:shadow-xl transition-shadow border-gray-200">
               <CardHeader>
-                <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-2xl">🚤</span>
-                </div>
                 <CardTitle className="font-heading">Maisons flottantes</CardTitle>
                 <CardDescription className="font-body">
                   Vivez au rythme de l'eau dans une habitation unique sur l'eau.
@@ -109,7 +97,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Properties */}
       <section className="py-16 px-4 bg-gray-50">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12 font-heading">
@@ -143,7 +130,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 px-4 bg-primary">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6 font-heading">

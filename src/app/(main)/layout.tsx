@@ -1,6 +1,8 @@
 import Header from '@/components/layout/header'
 import Footer from '@/components/layout/footer'
 
+// Forcer le rendu dynamique pour tout le groupe (main)
+export const dynamic = 'force-dynamic';
 export default function MainLayout({
   children,
 }: {

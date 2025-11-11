@@ -135,6 +135,6 @@ propertySchema.index({ owner: 1 });
 propertySchema.index({ isAvailable: 1 });
 propertySchema.index({ rating: -1 });
 
-export const Property = mongoose.model<IProperty>('Property', propertySchema);
+export const Property = mongoose.models.Property || mongoose.model<IProperty>('Property', propertySchema);
 
 

@@ -27,6 +27,6 @@ favoriteSchema.index({ userId: 1, propertyId: 1 }, { unique: true });
 // Index pour optimiser les requêtes
 favoriteSchema.index({ userId: 1, createdAt: -1 });
 
-export const Favorite = mongoose.model<IFavorite>('Favorite', favoriteSchema);
+export const Favorite = mongoose.models.Favorite || mongoose.model<IFavorite>('Favorite', favoriteSchema);
 
 

@@ -64,6 +64,6 @@ bookingSchema.methods.overlaps = function(startDate: Date, endDate: Date): boole
   return this.startDate < endDate && this.endDate > startDate;
 };
 
-export const Booking = mongoose.model<IBooking>('Booking', bookingSchema);
+export const Booking = mongoose.models.Booking || mongoose.model<IBooking>('Booking', bookingSchema);
 
 

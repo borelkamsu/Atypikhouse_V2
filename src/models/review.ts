@@ -44,6 +44,6 @@ reviewSchema.index({ rating: -1 });
 // Empêcher un utilisateur de poster plusieurs avis pour la même propriété
 reviewSchema.index({ property: 1, user: 1 }, { unique: true });
 
-export const Review = mongoose.model<IReview>('Review', reviewSchema);
+export const Review = mongoose.models.Review || mongoose.model<IReview>('Review', reviewSchema);
 
 

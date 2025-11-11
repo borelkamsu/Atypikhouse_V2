@@ -113,4 +113,5 @@ userSchema.methods.comparePassword = async function(candidatePassword: string): 
 userSchema.index({ email: 1 });
 userSchema.index({ role: 1 });
 
-export const User = mongoose.model<IUser>('User', userSchema);
+// Éviter l'erreur "Cannot overwrite model" en développement (hot reload)
+export const User = mongoose.models.User || mongoose.model<IUser>('User', userSchema);

@@ -37,6 +37,6 @@ const amenitySchema = new Schema<IAmenity>({
 amenitySchema.index({ name: 1 });
 amenitySchema.index({ category: 1, isActive: 1 });
 
-export const Amenity = mongoose.model<IAmenity>('Amenity', amenitySchema);
+export const Amenity = mongoose.models.Amenity || mongoose.model<IAmenity>('Amenity', amenitySchema);
 
 

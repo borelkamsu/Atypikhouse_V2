@@ -63,8 +63,8 @@ export default function BookingForm({ propertyId, pricePerNight }: BookingFormPr
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           propertyId,
-          startDate: bookingData.startDate,
-          endDate: bookingData.endDate,
+          startDate: new Date(bookingData.startDate).toISOString(),
+          endDate: new Date(bookingData.endDate).toISOString(),
           guests: bookingData.guests
         })
       })

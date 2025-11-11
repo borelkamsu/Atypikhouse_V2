@@ -84,8 +84,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { title, description, type, location, price, capacity, amenities, images } = body;
 
-    // Validation des données
-    if (!title || !description || !type || !location || !price || !capacity || !images) {
+    // Validation des données (images est optionnel)
+    if (!title || !description || !type || !location || !price || !capacity) {
       return NextResponse.json(
         { error: 'Tous les champs obligatoires doivent être remplis' },
         { status: 400 }
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     const ownerId = token.userId;
 
-    // Créer la nouvelle propriété
+    // Créer la nouvelle propriété (images par défaut à tableau vide)
     const property = new Property({
       title,
       description,
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       price,
       capacity,
       amenities: amenities || [],
-      images,
+      images: images || [],
       owner: ownerId
     });
 
@@ -136,5 +136,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-

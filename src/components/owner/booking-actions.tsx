@@ -33,9 +33,11 @@ export function BookingActions({ bookingId }: BookingActionsProps) {
         });
         router.refresh();
       } else {
+        const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue' }));
+        console.error('Erreur API:', response.status, errorData);
         toast({
           title: 'Erreur',
-          description: 'Impossible de traiter la réservation',
+          description: `${errorData.message || 'Impossible de traiter la réservation'} (${response.status})`,
           variant: 'destructive',
         });
       }

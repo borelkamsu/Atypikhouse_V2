@@ -5,12 +5,15 @@ import { Search, MapPin, Calendar, Users, Star, ArrowRight } from 'lucide-react'
 import Link from 'next/link';
 import Image from 'next/image';
 import { FavoriteButton } from '@/components/property/favorite-button';
+import connectDB from '@/lib/db';
+import Property from '@/models/property';
+import Booking from '@/models/booking';
 
 // Forcer le rendu dynamique pour éviter l'erreur clientReferenceManifest
 export const dynamic = 'force-dynamic';
 
 // Types pour les données
-interface Property {
+interface PropertyType {
   _id: string;
   title: string;
   description: string;
@@ -34,42 +37,71 @@ interface Category {
   count: number;
 }
 
-// Fetch des propriétés en vedette (SSR)
-async function getFeaturedProperties(): Promise<Property[]> {
+// Fetch des propriétés en vedette (SSR - Direct DB access)
+async function getFeaturedProperties(): Promise<PropertyType[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5000';
-    const res = await fetch(`${baseUrl}/api/properties/featured?limit=3`, {
-      cache: 'no-store' // Toujours récupérer les données fraîches
-    });
+    await connectDB();
     
-    if (!res.ok) {
-      console.error('Erreur lors de la récupération des propriétés en vedette');
-      return [];
-    }
-    
-    const data = await res.json();
-    return data.properties || [];
+    // Récupérer les 3 propriétés les plus récemment réservées
+    const recentBookings = await Booking.find({ status: { $ne: 'cancelled' } })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate('propertyId')
+      .lean();
+
+    const propertyIds = recentBookings
+      .map((booking: any) => booking.propertyId?._id)
+      .filter((id: any) => id);
+
+    const uniquePropertyIds = [...new Set(propertyIds)].slice(0, 3);
+
+    const properties = await Property.find({
+      _id: { $in: uniquePropertyIds },
+      isAvailable: true
+    }).limit(3).lean();
+
+    return properties.map((prop: any) => ({
+      _id: prop._id.toString(),
+      title: prop.title,
+      description: prop.description,
+      type: prop.type,
+      location: prop.location,
+      price: prop.price,
+      images: prop.images || [],
+      rating: prop.rating || 0
+    }));
   } catch (error) {
     console.error('Erreur lors de la récupération des propriétés en vedette:', error);
     return [];
   }
 }
 
-// Fetch des catégories (SSR)
+// Fetch des catégories (SSR - Direct DB access)
 async function getCategories(): Promise<Category[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5000';
-    const res = await fetch(`${baseUrl}/api/properties/categories`, {
-      cache: 'no-store'
-    });
+    await connectDB();
     
-    if (!res.ok) {
-      console.error('Erreur lors de la récupération des catégories');
-      return [];
-    }
-    
-    const data = await res.json();
-    return data.categories || [];
+    const categoryMapping: Record<string, { title: string; description: string }> = {
+      cabin: { title: 'Cabanes', description: 'Cabanes perchées dans les arbres' },
+      yurt: { title: 'Yourtes', description: 'Hébergements nomades confortables' },
+      floating: { title: 'Maisons flottantes', description: 'Sur l\'eau avec vue imprenable' },
+      dome: { title: 'Dômes', description: 'Architecture moderne et unique' },
+      treehouse: { title: 'Cabanes', description: 'Dans les arbres' },
+      unusual: { title: 'Insolites', description: 'Logements vraiment atypiques' }
+    };
+
+    const aggregation = await Property.aggregate([
+      { $match: { isAvailable: true } },
+      { $group: { _id: '$type', count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+
+    return aggregation.map((item: any) => ({
+      type: item._id,
+      title: categoryMapping[item._id]?.title || item._id,
+      description: categoryMapping[item._id]?.description || '',
+      count: item.count
+    }));
   } catch (error) {
     console.error('Erreur lors de la récupération des catégories:', error);
     return [];
@@ -77,7 +109,7 @@ async function getCategories(): Promise<Category[]> {
 }
 
 export default async function Home() {
-  // Fetch des données côté serveur (SSR)
+  // Fetch des données côté serveur (SSR - Direct DB)
   const [featuredProperties, categories] = await Promise.all([
     getFeaturedProperties(),
     getCategories()

@@ -1,20 +1,7 @@
 import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
-
-// Utiliser la variable d'environnement correcte
-// En dev : http://localhost:5000 (selon .env.local)
-// En prod : URL de déploiement Vercel
-function getApiUrl(path: string): string {
-  // En production (Vercel, etc), utiliser l'URL du déploiement  
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}${path}`
-  }
-  
-  // En développement, utiliser NEXT_PUBLIC_APP_URL depuis .env.local
-  // qui pointe vers http://localhost:5000
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'
-  return `${baseUrl}${path}`
-}
+import connectDB from '@/lib/db/mongodb'
+import { Property as PropertyModel } from '@/models/property'
 
 export interface Property {
   _id: string
@@ -68,79 +55,106 @@ export async function getProperties(params?: {
   maxPrice?: string
   page?: number
 }): Promise<PropertiesResponse> {
-  const searchParams = new URLSearchParams()
-  if (params?.search) searchParams.append('search', params.search)
-  if (params?.type) searchParams.append('type', params.type)
-  if (params?.city) searchParams.append('city', params.city)
-  if (params?.minPrice) searchParams.append('minPrice', params.minPrice)
-  if (params?.maxPrice) searchParams.append('maxPrice', params.maxPrice)
-  if (params?.page) searchParams.append('page', params.page.toString())
+  try {
+    await connectDB()
+    
+    const page = params?.page || 1
+    const limit = 10
+    const skip = (page - 1) * limit
 
-  const url = getApiUrl(`/api/properties?${searchParams.toString()}`)
-  
-  const response = await fetch(url, {
-    next: { revalidate: 0 }, // Toujours avoir les données fraîches
-    headers: {
-      'Content-Type': 'application/json',
+    // Construction du filtre MongoDB
+    const filter: any = { isAvailable: true }
+    
+    if (params?.type) {
+      filter.type = params.type
     }
-  })
+    
+    if (params?.city) {
+      filter['location.city'] = new RegExp(params.city, 'i')
+    }
+    
+    if (params?.search) {
+      filter.$or = [
+        { title: new RegExp(params.search, 'i') },
+        { description: new RegExp(params.search, 'i') }
+      ]
+    }
+    
+    if (params?.minPrice || params?.maxPrice) {
+      filter['price.perNight'] = {}
+      if (params.minPrice) filter['price.perNight'].$gte = parseFloat(params.minPrice)
+      if (params.maxPrice) filter['price.perNight'].$lte = parseFloat(params.maxPrice)
+    }
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch properties: ${response.status}`)
-  }
+    const [properties, total] = await Promise.all([
+      PropertyModel.find(filter)
+        .populate('owner', 'firstName lastName')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      PropertyModel.countDocuments(filter)
+    ])
 
-  const data = await response.json()
-  return {
-    properties: data.properties || [],
-    pagination: data.pagination || { total: 0, page: 1, limit: 10, totalPages: 0 }
+    return {
+      properties: properties.map((prop: any) => ({
+        ...prop,
+        _id: prop._id.toString(),
+        owner: prop.owner ? {
+          _id: prop.owner._id.toString(),
+          firstName: prop.owner.firstName,
+          lastName: prop.owner.lastName
+        } : undefined
+      })),
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching properties:', error)
+    return {
+      properties: [],
+      pagination: { total: 0, page: 1, limit: 10, totalPages: 0 }
+    }
   }
 }
 
 export async function getPropertyById(id: string): Promise<Property> {
-  const url = getApiUrl(`/api/properties/${id}`)
-  
-  const response = await fetch(url, {
-    next: { revalidate: 0 },
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  })
+  try {
+    await connectDB()
+    
+    const property: any = await PropertyModel.findById(id)
+      .populate('owner', 'firstName lastName')
+      .lean()
 
-  if (response.status === 404) {
+    if (!property) {
+      notFound()
+    }
+
+    return {
+      ...property,
+      _id: property._id.toString(),
+      owner: property.owner ? {
+        _id: property.owner._id.toString(),
+        firstName: property.owner.firstName,
+        lastName: property.owner.lastName
+      } : undefined
+    }
+  } catch (error) {
+    console.error('Error fetching property:', error)
     notFound()
   }
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch property: ${response.status}`)
-  }
-
-  return await response.json()
 }
 
 export async function checkFavorite(propertyId: string): Promise<boolean> {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('token')
-    
-    if (!token) return false
-
-    const url = getApiUrl(`/api/favorites/${propertyId}/check`)
-    
-    const response = await fetch(url, {
-      next: { revalidate: 0 },
-      headers: {
-        'Content-Type': 'application/json',
-        'Cookie': `token=${token.value}`
-      }
-    })
-
-    if (!response.ok) return false
-
-    const data = await response.json()
-    return data.isFavorited || false
+    // Pour l'instant, retourner false car checkFavorite nécessite l'authentification
+    // qui est mieux gérée par le client component
+    return false
   } catch (error) {
-    // Ne pas throw pour checkFavorite - c'est optionnel
-    console.error('Error checking favorite:', error)
     return false
   }
 }

@@ -73,7 +73,7 @@ export default async function Home() {
     {
       title: 'Cabanes dans les arbres',
       description: 'Vivez une expérience unique en hauteur',
-      image: '/images/treehouse_cabin_in_f_91e06274.jpg',
+      image: '/images/hom2.jpeg',
       type: 'cabin'
     },
     {

@@ -21,11 +21,11 @@ export function SearchForm() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto" data-testid="form-search">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 max-w-4xl mx-auto w-full" data-testid="form-search">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mb-4">
         {/* Où */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="sm:col-span-2 md:col-span-2">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
             Où
           </label>
           <Input
@@ -37,9 +37,9 @@ export function SearchForm() {
         </div>
 
         {/* Type d'hébergement */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Type d'hébergement
+        <div className="sm:col-span-2 md:col-span-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+            Type
           </label>
           <Select defaultValue="all">
             <SelectTrigger className="w-full text-gray-900" data-testid="select-type">
@@ -58,7 +58,7 @@ export function SearchForm() {
 
         {/* Arrivée */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
             Arrivée
           </label>
           <Input
@@ -71,7 +71,7 @@ export function SearchForm() {
 
         {/* Départ */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
             Départ
           </label>
           <Input
@@ -84,10 +84,10 @@ export function SearchForm() {
       </div>
 
       {/* Voyageurs + Bouton Rechercher */}
-      <div className="flex flex-col md:flex-row items-end gap-4">
-        <div className="w-full md:w-auto">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Voyageurs:
+      <div className="flex flex-col sm:flex-row items-end gap-3 sm:gap-4">
+        <div className="w-full sm:w-auto">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+            Voyageurs
           </label>
           <div className="flex items-center gap-3">
             <Button
@@ -118,10 +118,10 @@ export function SearchForm() {
 
         <Button
           onClick={handleSearch}
-          className="w-full md:w-auto bg-[#16A433] hover:bg-[#138a2c] text-white px-8 py-6 text-lg"
+          className="w-full sm:w-auto bg-[#16A433] hover:bg-[#138a2c] text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg"
           data-testid="button-search"
         >
-          <Search className="mr-2 h-5 w-5" />
+          <Search className="mr-2 h-4 sm:h-5 w-4 sm:w-5" />
           Rechercher
         </Button>
       </div>

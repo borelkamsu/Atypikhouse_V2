@@ -125,7 +125,7 @@ export default async function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section 
-        className="relative h-[600px] md:h-[700px] bg-cover bg-center"
+        className="relative min-h-[80vh] sm:min-h-[85vh] md:min-h-[700px] bg-cover bg-center"
         style={{
           backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(/images/hero-background.jpg)',
           backgroundSize: 'cover',
@@ -133,10 +133,10 @@ export default async function Home() {
         }}
       >
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 font-playfair" data-testid="text-hero-title">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 sm:mb-6 font-playfair leading-tight" data-testid="text-hero-title">
             Des habitations insolites<br />pour des séjours<br />inoubliables
           </h1>
-          <p className="text-lg md:text-xl text-center mb-12 max-w-3xl" data-testid="text-hero-subtitle">
+          <p className="text-base sm:text-lg md:text-xl text-center mb-8 sm:mb-12 max-w-3xl px-2" data-testid="text-hero-subtitle">
             Découvrez nos cabanes dans les arbres, yourtes et habitations flottantes en harmonie avec la nature.
           </p>
           
@@ -145,12 +145,12 @@ export default async function Home() {
       </section>
 
       {/* Explorez nos types d'hébergements */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-12 sm:py-16 px-4 bg-white">
         <div className="container mx-auto max-w-7xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 font-playfair" data-testid="text-types-title">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 font-playfair" data-testid="text-types-title">
             Explorez nos types d'hébergements
           </h2>
-          <p className="text-center text-gray-600 mb-12" data-testid="text-types-subtitle">
+          <p className="text-sm sm:text-base text-center text-gray-600 mb-8 sm:mb-12 px-2" data-testid="text-types-subtitle">
             Des habitations insolites pour une expérience en harmonie avec la nature
           </p>
 
@@ -181,9 +181,9 @@ export default async function Home() {
       </section>
 
       {/* Nos hébergements exceptionnels */}
-      <section className="py-16 px-4 bg-gray-50">
+      <section className="py-12 sm:py-16 px-4 bg-gray-50">
         <div className="container mx-auto max-w-7xl">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 font-playfair" data-testid="text-featured-title">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 font-playfair" data-testid="text-featured-title">
             Nos hébergements exceptionnels
           </h2>
 
@@ -232,30 +232,30 @@ export default async function Home() {
       </section>
 
       {/* À propos d'AtypikHouse */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-12 sm:py-16 px-4 bg-white">
         <div className="container mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 font-playfair" data-testid="text-about-title">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 font-playfair" data-testid="text-about-title">
                 À propos d'AtypikHouse
               </h2>
-              <p className="text-gray-700 mb-4 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-700 mb-4 leading-relaxed">
                 AtypikHouse est une SARL fondée par trois passionnés de voyages, d'habitat alternatif et de vie en harmonie avec la nature. Notre mission est de vous proposer des expériences d'hébergement uniques à travers la France et l'Europe.
               </p>
-              <p className="text-gray-700 mb-4 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-700 mb-4 leading-relaxed">
                 Basés à Pierrefonds dans l'Oise, nous mettons en relation des propriétaires d'habitations insolites avec des voyageurs en quête d'authenticité et d'expériences inoubliables.
               </p>
-              <p className="text-gray-700 mb-8 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-700 mb-6 sm:mb-8 leading-relaxed">
                 Que vous soyez à la recherche d'une cabane perchée dans les arbres, d'une yourte traditionnelle ou d'une habitation flottante, nous vous proposons une sélection rigoureuse de logements atypiques pour des séjours hors du commun.
               </p>
-              <div className="flex gap-4">
-                <Button variant="outline" asChild data-testid="button-learn-more">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button variant="outline" asChild data-testid="button-learn-more" className="w-full sm:w-auto">
                   <Link href="/about">
                     En savoir plus
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button className="bg-[#FF8C00] hover:bg-[#e67e00] text-white" asChild data-testid="button-become-owner">
+                <Button className="bg-[#FF8C00] hover:bg-[#e67e00] text-white w-full sm:w-auto" asChild data-testid="button-become-owner">
                   <Link href="/owner/register">
                     Devenir propriétaire
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -264,19 +264,19 @@ export default async function Home() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mt-8 lg:mt-0">
               <div className="rounded-lg overflow-hidden">
                 <img
                   src="/images/about-1.jpg"
                   alt="Cabane dans les arbres"
-                  className="w-full h-64 object-cover"
+                  className="w-full h-48 sm:h-64 object-cover"
                 />
               </div>
               <div className="rounded-lg overflow-hidden">
                 <img
                   src="/images/about-2.jpg"
                   alt="Hébergement moderne"
-                  className="w-full h-64 object-cover"
+                  className="w-full h-48 sm:h-64 object-cover"
                 />
               </div>
             </div>
@@ -285,9 +285,9 @@ export default async function Home() {
       </section>
 
       {/* Ce que disent nos voyageurs */}
-      <section className="py-16 px-4 bg-gray-50">
+      <section className="py-12 sm:py-16 px-4 bg-gray-50">
         <div className="container mx-auto max-w-7xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 font-playfair" data-testid="text-testimonials-title">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 font-playfair" data-testid="text-testimonials-title">
             Ce que disent nos voyageurs
           </h2>
 
@@ -327,7 +327,7 @@ export default async function Home() {
 
       {/* Vous possédez une habitation insolite ? */}
       <section 
-        className="relative py-24 px-4 bg-cover bg-center"
+        className="relative py-16 sm:py-20 md:py-24 px-4 bg-cover bg-center"
         style={{
           backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/images/hom4.jpeg)',
           backgroundSize: 'cover',
@@ -335,10 +335,10 @@ export default async function Home() {
         }}
       >
         <div className="container mx-auto max-w-7xl text-white">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 font-playfair" data-testid="text-owner-cta-title">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 font-playfair" data-testid="text-owner-cta-title">
             Vous possédez une habitation insolite ?
           </h2>
-          <p className="text-center text-lg mb-12 max-w-3xl mx-auto">
+          <p className="text-center text-sm sm:text-base md:text-lg mb-8 sm:mb-12 max-w-3xl mx-auto px-2">
             Rejoignez AtypikHouse et partagez votre hébergement unique avec des voyageurs en quête d'expériences authentiques.
           </p>
 
@@ -380,13 +380,13 @@ export default async function Home() {
             </Card>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Button className="bg-[#FF8C00] hover:bg-[#e67e00] text-white px-8 py-6 text-lg" asChild data-testid="button-cta-become-owner">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto">
+            <Button className="bg-[#FF8C00] hover:bg-[#e67e00] text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg w-full sm:w-auto" asChild data-testid="button-cta-become-owner">
               <Link href="/owner/register">
                 Devenir propriétaire
               </Link>
             </Button>
-            <Button className="bg-[#16A433] hover:bg-[#138a2c] text-white px-8 py-6 text-lg" asChild data-testid="button-cta-create-listing">
+            <Button className="bg-[#16A433] hover:bg-[#138a2c] text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg w-full sm:w-auto" asChild data-testid="button-cta-create-listing">
               <Link href="/owner/properties/new">
                 Créer un hébergement
               </Link>

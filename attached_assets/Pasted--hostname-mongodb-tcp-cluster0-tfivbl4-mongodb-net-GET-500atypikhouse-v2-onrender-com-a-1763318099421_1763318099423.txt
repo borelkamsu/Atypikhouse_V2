@@ -1,0 +1,101 @@
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+     [GET]500atypikhouse-v2.onrender.com/api/admin/owners?clientIP="78.199.177.190" requestID="2b0e40c7-9bc8-48ae" responseTimeMS=11 responseBytes=342 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+}
+     [GET]500atypikhouse-v2.onrender.com/api/admin/properties?clientIP="78.199.177.190" requestID="9a5b07eb-c6da-4353" responseTimeMS=15 responseBytes=341 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+Erreur lors de la récupération des propriétés: [Error: querySrv ENOTFOUND _mongodb._tcp.cluster0.tfivbl4.mongodb.net] {
+  errno: undefined,
+  code: 'ENOTFOUND',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+}
+     [GET]200atypikhouse-v2.onrender.com/favicon.icoclientIP="78.199.177.190" requestID="4a33cbdf-ff10-4403" responseTimeMS=10 responseBytes=26232 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/adminclientIP="78.199.177.190" requestID="d9f9a4ca-0ef8-4874" responseTimeMS=14 responseBytes=4929 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]500atypikhouse-v2.onrender.com/api/admin/statsclientIP="78.199.177.190" requestID="6de79dff-ae7f-4853" responseTimeMS=10 responseBytes=340 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     ==> Detected service running on port 10000
+Erreur lors de la récupération des statistiques: [Error: querySrv ENOTFOUND _mongodb._tcp.cluster0.tfivbl4.mongodb.net] {
+  errno: undefined,
+  code: 'ENOTFOUND',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+}
+     ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+     [GET]500atypikhouse-v2.onrender.com/api/admin/users?role=userclientIP="78.199.177.190" requestID="5b859697-5523-4c29" responseTimeMS=22 responseBytes=341 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+Erreur lors de la récupération des utilisateurs: [Error: querySrv ENOTFOUND _mongodb._tcp.cluster0.tfivbl4.mongodb.net] {
+  errno: undefined,
+  code: 'ENOTFOUND',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+}
+     [GET]500atypikhouse-v2.onrender.com/api/admin/owners?clientIP="78.199.177.190" requestID="0ab94a7b-1778-496b" responseTimeMS=8 responseBytes=342 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]500atypikhouse-v2.onrender.com/api/admin/properties?clientIP="78.199.177.190" requestID="7c401d5d-cc81-4821" responseTimeMS=10 responseBytes=341 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+Erreur lors de la récupération des propriétaires: [Error: querySrv ENOTFOUND _mongodb._tcp.cluster0.tfivbl4.mongodb.net] {
+  errno: undefined,
+  code: 'ENOTFOUND',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+}
+Erreur lors de la récupération des propriétés: [Error: querySrv ENOTFOUND _mongodb._tcp.cluster0.tfivbl4.mongodb.net] {
+  errno: undefined,
+  code: 'ENOTFOUND',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+}
+     [GET]500atypikhouse-v2.onrender.com/api/admin/bookings?clientIP="78.199.177.190" requestID="a0e52893-733d-4c42" responseTimeMS=16 responseBytes=343 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+Erreur lors de la récupération des réservations: [Error: querySrv ENOTFOUND _mongodb._tcp.cluster0.tfivbl4.mongodb.net] {
+  errno: undefined,
+  code: 'ENOTFOUND',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+}
+Erreur getFeaturedProperties: [Error: querySrv ENOTFOUND _mongodb._tcp.cluster0.tfivbl4.mongodb.net] {
+  errno: undefined,
+     [GET]304atypikhouse-v2.onrender.com/images/floating_house_on_wa_48f9049d.jpgclientIP="78.199.177.190" requestID="0f197c69-f4d5-444a" responseTimeMS=1 responseBytes=245 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]304atypikhouse-v2.onrender.com/images/hom2.jpegclientIP="78.199.177.190" requestID="4bb558f8-b843-4334" responseTimeMS=5 responseBytes=245 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]304atypikhouse-v2.onrender.com/images/about-1.jpgclientIP="78.199.177.190" requestID="226746c4-0d72-4437" responseTimeMS=6 responseBytes=245 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/login?_rsc=3lb4gclientIP="78.199.177.190" requestID="7f9577aa-a3f3-4d93" responseTimeMS=6 responseBytes=2302 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]304atypikhouse-v2.onrender.com/images/logo.jpegclientIP="78.199.177.190" requestID="d1defb21-f667-4777" responseTimeMS=4 responseBytes=244 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]304atypikhouse-v2.onrender.com/images/hom4.jpegclientIP="78.199.177.190" requestID="5e5e5b90-3dbf-48f6" responseTimeMS=2 responseBytes=245 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]500atypikhouse-v2.onrender.com/api/auth/meclientIP="78.199.177.190" requestID="a892aa0d-8f48-474a" responseTimeMS=9 responseBytes=320 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]304atypikhouse-v2.onrender.com/images/hero-background.jpgclientIP="78.199.177.190" requestID="52f83899-f2fd-4148" responseTimeMS=2 responseBytes=245 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/favicon.icoclientIP="78.199.177.190" requestID="c5e9ebe2-c778-4a93" responseTimeMS=7 responseBytes=26232 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/clientIP="78.199.177.190" requestID="f415cc0d-58d2-4a4f" responseTimeMS=86 responseBytes=18327 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]304atypikhouse-v2.onrender.com/images/yurt_tent_nomadic_ac_d9740ee1.jpgclientIP="78.199.177.190" requestID="31fdb8b3-fb9e-4dd9" responseTimeMS=6 responseBytes=245 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]304atypikhouse-v2.onrender.com/images/tiny_house_small_mod_a87ff2d2.jpgclientIP="78.199.177.190" requestID="bb5aa8cc-3b94-4396" responseTimeMS=6 responseBytes=245 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/register?_rsc=3lb4gclientIP="78.199.177.190" requestID="c6862c51-5430-45ec" responseTimeMS=6 responseBytes=2324 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/host?_rsc=3lb4gclientIP="78.199.177.190" requestID="06912f24-0d6c-45ed" responseTimeMS=5 responseBytes=2264 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/properties?_rsc=3lb4gclientIP="78.199.177.190" requestID="5209350a-0480-4d2a" responseTimeMS=8 responseBytes=481 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]304atypikhouse-v2.onrender.com/images/about-2.jpgclientIP="78.199.177.190" requestID="38542dda-07b4-4db7" responseTimeMS=3 responseBytes=245 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+  code: 'ENOTFOUND',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+}
+Erreur lors de la récupération de l'utilisateur: [Error: querySrv ENOTFOUND _mongodb._tcp.cluster0.tfivbl4.mongodb.net] {
+  errno: undefined,
+  code: 'ENOTFOUND',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+}
+     [GET]404atypikhouse-v2.onrender.com/owner/register?_rsc=3lb4gclientIP="78.199.177.190" requestID="89ca1ee2-ff24-4539" responseTimeMS=14 responseBytes=2224 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]404atypikhouse-v2.onrender.com/about?_rsc=3lb4gclientIP="78.199.177.190" requestID="a188ef86-6036-45f2" responseTimeMS=15 responseBytes=2224 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/cgv-cgu?_rsc=pu02oclientIP="78.199.177.190" requestID="0e6fb191-27d4-44f6" responseTimeMS=9 responseBytes=5503 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/properties?type=cabin&_rsc=vusbgclientIP="78.199.177.190" requestID="b8e7f507-facf-4b47" responseTimeMS=14 responseBytes=2133 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+Error fetching properties: [Error: querySrv ENOTFOUND _mongodb._tcp.cluster0.tfivbl4.mongodb.net] {
+  errno: undefined,
+  code: 'ENOTFOUND',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+}
+     [GET]404atypikhouse-v2.onrender.com/terms?_rsc=pu02oclientIP="78.199.177.190" requestID="77993132-8613-4067" responseTimeMS=14 responseBytes=2224 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]404atypikhouse-v2.onrender.com/cookies?_rsc=pu02oclientIP="78.199.177.190" requestID="1f94d7e9-d40f-4e94" responseTimeMS=15 responseBytes=2224 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]404atypikhouse-v2.onrender.com/privacy?_rsc=pu02oclientIP="78.199.177.190" requestID="4fc37303-3672-4bf9" responseTimeMS=17 responseBytes=2224 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/mentions-legales?_rsc=pu02oclientIP="78.199.177.190" requestID="81753957-83d8-48e7" responseTimeMS=16 responseBytes=4177 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/properties?type=cabin&_rsc=3lb4gclientIP="78.199.177.190" requestID="33d91048-beb0-48f0" responseTimeMS=8 responseBytes=497 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/properties?type=yurt&_rsc=vusbgclientIP="78.199.177.190" requestID="2cedf54d-fab8-4e0b" responseTimeMS=13 responseBytes=2132 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+Error fetching properties: [Error: querySrv ENOTFOUND _mongodb._tcp.cluster0.tfivbl4.mongodb.net] {
+  errno: undefined,
+  code: 'ENOTFOUND',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.cluster0.tfivbl4.mongodb.net'
+}
+     [GET]200atypikhouse-v2.onrender.com/properties?type=cabin&_rsc=3lb4gclientIP="78.199.177.190" requestID="b49f5fef-6b38-43ed" responseTimeMS=12 responseBytes=497 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+     [GET]200atypikhouse-v2.onrender.com/owner/properties/new?_rsc=3lb4gclientIP="78.199.177.190" requestID="4cb4c5e4-eac0-49d2" responseTimeMS=10 responseBytes=2387 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"

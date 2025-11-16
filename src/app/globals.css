@@ -17,15 +17,15 @@
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
   
-  /* Primary - Green (#16A433) */
-  --primary: 132 76% 36%;
+  /* Primary - Green (Dark) */
+  --primary: 132 76% 30%;
   --primary-foreground: 0 0% 100%;
   
   /* Primary light - Lighter green */
-  --primary-light: 132 76% 44%;
+  --primary-light: 132 76% 38%;
   
   /* Primary dark - Darker green */
-  --primary-dark: 132 76% 28%;
+  --primary-dark: 132 76% 24%;
   
   /* Secondary - Brown */
   --secondary: 16 43% 38%;
@@ -58,7 +58,7 @@
   /* Border, Input, Ring */
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
-  --ring: 132 76% 36%;
+  --ring: 132 76% 30%;
   
   /* Radius */
   --radius: 0.5rem;
@@ -78,14 +78,14 @@
   --popover-foreground: 0 0% 95%;
   
   /* Primary - Green (darker in dark mode) */
-  --primary: 144 50% 42%;
+  --primary: 132 76% 38%;
   --primary-foreground: 0 0% 100%;
   
   /* Primary light - Lighter green */
-  --primary-light: 144 50% 50%;
+  --primary-light: 132 76% 46%;
   
   /* Primary dark - Darker green */
-  --primary-dark: 144 50% 33%;
+  --primary-dark: 132 76% 30%;
   
   /* Secondary - Brown (lighter in dark mode) */
   --secondary: 16 30% 56%;

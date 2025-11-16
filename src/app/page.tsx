@@ -329,7 +329,7 @@ export default async function Home() {
       <section 
         className="relative py-24 px-4 bg-cover bg-center"
         style={{
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/images/owner-cta-background.jpg)',
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/images/hom4.jpeg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}

@@ -127,7 +127,7 @@ export default async function Home() {
       <section 
         className="relative h-[600px] md:h-[700px] bg-cover bg-center"
         style={{
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(/images/land1_1763311281085.jpg)',
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(/images/hero-background.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
@@ -267,15 +267,15 @@ export default async function Home() {
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-lg overflow-hidden">
                 <img
-                  src="/images/land3_1763311281083.jpg"
+                  src="/images/about-1.jpg"
                   alt="Cabane dans les arbres"
                   className="w-full h-64 object-cover"
                 />
               </div>
               <div className="rounded-lg overflow-hidden">
                 <img
-                  src="/images/land3_1763311281083.jpg"
-                  alt="Piscine moderne"
+                  src="/images/about-2.jpg"
+                  alt="Hébergement moderne"
                   className="w-full h-64 object-cover"
                 />
               </div>
@@ -329,7 +329,7 @@ export default async function Home() {
       <section 
         className="relative py-24 px-4 bg-cover bg-center"
         style={{
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/images/land4_1763311281082.jpg)',
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/images/owner-cta-background.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}

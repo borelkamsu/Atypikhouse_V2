@@ -31,7 +31,7 @@ export function SearchForm() {
           <Input
             type="text"
             placeholder="Destination"
-            className="w-full"
+            className="w-full text-gray-900"
             data-testid="input-destination"
           />
         </div>
@@ -42,7 +42,7 @@ export function SearchForm() {
             Type d'hébergement
           </label>
           <Select defaultValue="all">
-            <SelectTrigger className="w-full" data-testid="select-type">
+            <SelectTrigger className="w-full text-gray-900" data-testid="select-type">
               <SelectValue placeholder="Tous types" />
             </SelectTrigger>
             <SelectContent>
@@ -64,7 +64,7 @@ export function SearchForm() {
           <Input
             type="date"
             defaultValue="2025-11-16"
-            className="w-full"
+            className="w-full text-gray-900"
             data-testid="input-arrival"
           />
         </div>
@@ -77,7 +77,7 @@ export function SearchForm() {
           <Input
             type="date"
             defaultValue="2025-11-17"
-            className="w-full"
+            className="w-full text-gray-900"
             data-testid="input-departure"
           />
         </div>
@@ -100,7 +100,7 @@ export function SearchForm() {
             >
               <Minus className="h-4 w-4" />
             </Button>
-            <span className="text-lg font-medium w-8 text-center" data-testid="text-guests-count">
+            <span className="text-lg font-medium w-8 text-center text-gray-900" data-testid="text-guests-count">
               {guests}
             </span>
             <Button

@@ -1,21 +1,33 @@
 # AtypikHouse Design Guidelines
 
-## Design Approach: Reference-Based (Airbnb + Creative Adaptations)
+## Design Approach: Exact Landing Page Recreation
 
-**Primary Inspiration**: Airbnb's accommodation platform patterns with enhanced visual storytelling for unique properties
+**CRITICAL**: This design must exactly match the provided screenshots (land1-5.jpg)
 **Key Principles**: 
-- Adventure-driven aesthetic celebrating unconventional stays
-- Immersive imagery showcasing property uniqueness
-- Trust-building through transparent information
-- Seamless booking experience across all devices
+- Couleurs exactes: Vert #16A433, Orange #FF8C00
+- Layout identique aux captures d'écran
+- Mêmes boutons, même typographie, même espacement
+
+---
+
+## Couleurs (EXACTES selon screenshots)
+
+### Palette principale
+- **Primary Green**: `#16A433` - Boutons "S'inscrire", "Rechercher", "Créer un hébergement"
+- **Orange**: `#FF8C00` - Bouton "Devenir propriétaire", icônes de fonctionnalités
+- **Dark Footer**: `#2D3748` - Fond du footer
+- **White**: `#FFFFFF` - Fond principal, texte sur fonds sombres
+- **Black**: `#1A202C` - Texte principal
+- **Gray Light**: `#F7FAFC` - Fonds de sections
+- **Gray Text**: `#718096` - Texte secondaire
 
 ---
 
 ## Typography System
 
 **Playfair Display** (Headings - Serif elegance):
-- H1: 48px/56px (mobile: 32px/40px) - Semibold
-- H2: 36px/44px (mobile: 28px/36px) - Semibold
+- H1: 48px/56px (mobile: 32px/40px) - Bold
+- H2: 36px/44px (mobile: 28px/36px) - Bold
 - H3: 24px/32px (mobile: 20px/28px) - Semibold
 
 **Inter** (Body - Modern clarity):

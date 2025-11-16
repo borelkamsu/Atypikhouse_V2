@@ -17,15 +17,15 @@
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
   
-  /* Primary - Green */
-  --primary: 144 50% 33%;
+  /* Primary - Green (#16A433) */
+  --primary: 132 76% 36%;
   --primary-foreground: 0 0% 100%;
   
   /* Primary light - Lighter green */
-  --primary-light: 144 50% 42%;
+  --primary-light: 132 76% 44%;
   
   /* Primary dark - Darker green */
-  --primary-dark: 144 50% 24%;
+  --primary-dark: 132 76% 28%;
   
   /* Secondary - Brown */
   --secondary: 16 43% 38%;
@@ -37,15 +37,15 @@
   /* Secondary dark - Darker brown */
   --secondary-dark: 17 43% 29%;
   
-  /* Accent - Orange */
+  /* Accent - Orange (#FF8C00) */
   --accent: 33 100% 50%;
-  --accent-foreground: 222 47% 11%;
+  --accent-foreground: 0 0% 100%;
   
   /* Accent light - Lighter orange */
-  --accent-light: 35 100% 65%;
+  --accent-light: 33 100% 60%;
   
   /* Accent dark - Darker orange */
-  --accent-dark: 25 100% 48%;
+  --accent-dark: 33 100% 40%;
   
   /* Destructive */
   --destructive: 0 84% 60%;
@@ -58,7 +58,7 @@
   /* Border, Input, Ring */
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
-  --ring: 144 50% 33%;
+  --ring: 132 76% 36%;
   
   /* Radius */
   --radius: 0.5rem;

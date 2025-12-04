@@ -39,3 +39,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Documentation (garder seulement README.md)
+*.md
+!README.md
+
+# Assets de développement/test
+attached_assets/
+
+# Fichiers de configuration locaux
+.replit
+replit.md
+replit_config_example.txt
+test-app.js
+config-git-credentials.ps1
+
+# Fichiers temporaires de logs
+*.txt
+!package.json
+!package-lock.json

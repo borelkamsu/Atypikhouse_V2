@@ -1,0 +1,46 @@
+# Documentation (non nécessaire pour le build)
+*.md
+!README.md
+
+# Assets de test/développement
+attached_assets/
+test-images/
+temp/
+
+# Fichiers Docker (si vous n'utilisez pas Docker sur Render)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Fichiers de configuration non nécessaires
+.replit
+replit.md
+replit_config_example.txt
+test-app.js
+
+# Scripts de développement uniquement (garder seulement package.json)
+scripts/*.js
+scripts/*.ts
+!scripts/package.json
+
+# Guides et documentation
+*_COMPLETE.md
+*_SUMMARY.md
+GUIDE_*.md
+DEBUG_*.md
+SOLUTION_*.md
+FIX_*.md
+CHECKLIST_*.md
+VERIFICATION_*.md
+RESOLUTION_*.md
+OPTIMISATION_*.md
+COMMANDES_*.md
+
+# Fichiers de logs
+*.txt
+!package.json
+!package-lock.json
+
+# Fichiers temporaires PowerShell
+config-git-credentials.ps1
+

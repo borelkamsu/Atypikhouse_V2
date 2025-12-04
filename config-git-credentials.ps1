@@ -35,3 +35,4 @@ Write-Host "   - Password: [collez votre token GitHub]" -ForegroundColor White
 Write-Host ""
 Write-Host "   Windows sauvegardera automatiquement les identifiants!" -ForegroundColor Green
 
+

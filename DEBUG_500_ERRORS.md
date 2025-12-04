@@ -189,3 +189,4 @@ Les nouveaux logs contiendront :
 - Les logs n'exposent PAS les valeurs (seulement si elles existent)
 - Utilisez des secrets forts pour `JWT_SECRET`
 
+

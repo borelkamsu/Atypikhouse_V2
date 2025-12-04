@@ -10,7 +10,10 @@ const hostRegistrationSchema = z.object({
   email: z.string().email('Email invalide'),
   password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
   phone: z.string().min(10, 'Numéro de téléphone invalide'),
-  siret: z.string().min(14, 'SIRET invalide').max(14, 'SIRET invalide'),
+  siret: z.string()
+    .min(14, 'Le SIRET doit contenir 14 chiffres')
+    .max(14, 'Le SIRET doit contenir 14 chiffres')
+    .regex(/^\d{14}$/, 'Le SIRET doit contenir uniquement 14 chiffres'),
   companyName: z.string().min(2, 'Nom de l\'entreprise requis'),
   businessDescription: z.string().optional()
 });
@@ -30,6 +33,24 @@ export async function POST(request: NextRequest) {
     await dbConnect();
     
     const body = await request.json();
+    
+    // Nettoyer le SIRET (retirer espaces et tirets)
+    if (body.siret) {
+      body.siret = body.siret.replace(/[\s-]/g, '');
+    }
+    
+    // Log les données reçues (sans le mot de passe pour sécurité)
+    console.log('📥 Données reçues pour inscription hôte:', {
+      firstName: body.firstName,
+      lastName: body.lastName,
+      email: body.email,
+      phone: body.phone,
+      siret: body.siret ? `${body.siret.substring(0, 4)}...` : 'manquant',
+      companyName: body.companyName,
+      hasPassword: !!body.password,
+      hasBusinessDescription: !!body.businessDescription
+    });
+    
     const validatedData = hostRegistrationSchema.parse(body);
 
     // Vérifier si l'email est déjà utilisé
@@ -90,13 +111,18 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
+      console.error('❌ Erreur de validation Zod:', error.errors);
       return NextResponse.json(
-        { message: 'Données invalides', errors: error.errors },
+        { 
+          message: 'Données invalides', 
+          errors: error.errors,
+          details: error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')
+        },
         { status: 400 }
       );
     }
 
-    console.error('Erreur lors de l\'inscription d\'un hôte:', error);
+    console.error('❌ Erreur lors de l\'inscription d\'un hôte:', error);
     console.error('Stack trace:', error?.stack);
     console.error('Error message:', error?.message);
     console.error('Error name:', error?.name);
@@ -108,6 +134,15 @@ export async function POST(request: NextRequest) {
       nodeEnv: process.env.NODE_ENV
     });
 
+    // Log de l'erreur MongoDB si présente
+    if (error?.name === 'MongoServerError' || error?.message?.includes('MongoDB')) {
+      console.error('❌ Erreur MongoDB détectée:', {
+        code: error?.code,
+        codeName: error?.codeName,
+        message: error?.message
+      });
+    }
+
     // Return more details in development, generic message in production
     const isDevelopment = process.env.NODE_ENV === 'development';
     return NextResponse.json(
@@ -115,7 +150,8 @@ export async function POST(request: NextRequest) {
         message: 'Erreur lors de l\'inscription d\'un hôte',
         ...(isDevelopment && {
           details: error?.message,
-          stack: error?.stack
+          stack: error?.stack,
+          errorName: error?.name
         })
       },
       { status: 500 }

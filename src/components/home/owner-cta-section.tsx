@@ -104,7 +104,7 @@ export function OwnerCTASection() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto">
           {showBecomeOwner && (
             <Button className="bg-[#FF8C00] hover:bg-[#e67e00] text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg w-full sm:w-auto" asChild data-testid="button-cta-become-owner">
-              <Link href="/owner/register">
+              <Link href="/host/register">
                 Devenir propriétaire
               </Link>
             </Button>

@@ -94,12 +94,12 @@ export default function Header() {
                 Devenir propriétaire
               </Link>
             )}
-            <a 
-              href="#about" 
-              className="font-medium text-gray-800 hover:text-primary transition-colors"
+            <Link 
+              href="/about" 
+              className={`font-medium transition-colors ${location === '/about' ? "text-primary" : "text-gray-800 hover:text-primary"}`}
             >
               À propos
-            </a>
+            </Link>
           </nav>
 
           {/* Actions Desktop - Visibles sur grand écran */}
@@ -247,13 +247,13 @@ export default function Header() {
                   Devenir propriétaire
                 </Link>
               )}
-              <a 
-                href="#about" 
-                className="text-gray-700 hover:text-primary transition-colors py-2"
+              <Link 
+                href="/about" 
+                className={`text-gray-700 hover:text-primary transition-colors py-2 ${location === '/about' ? "text-primary font-semibold" : ""}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 À propos
-              </a>
+              </Link>
               
               {/* Actions utilisateur mobile */}
               <div className="pt-4 border-t border-gray-200 space-y-3">

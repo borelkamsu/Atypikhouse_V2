@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Star, MapPin, ArrowRight } from 'lucide-react';
 import { SearchForm } from '@/components/home/search-form';
 import { OwnerCTASection } from '@/components/home/owner-cta-section';
-import connectDB from '@/lib/db/mongodb';
+import dbConnect from '@/lib/db/mongodb';
 import { Property } from '@/models/property';
 import { Booking } from '@/models/booking';
 
@@ -28,11 +28,12 @@ interface PropertyType {
   rating: number;
 }
 
-// Fetch propriétés en vedette (les 3 plus récemment réservées)
+// Fetch propriétés en vedette (les 3 plus récemment réservées, ou les dernières disponibles)
 async function getFeaturedProperties(): Promise<PropertyType[]> {
   try {
-    await connectDB();
+    await dbConnect();
     
+    // Essayer d'abord de trouver les propriétés récemment réservées
     const recentBookings = await Booking.find({ status: { $ne: 'cancelled' } })
       .sort({ createdAt: -1 })
       .limit(10)
@@ -40,15 +41,48 @@ async function getFeaturedProperties(): Promise<PropertyType[]> {
       .lean();
 
     const propertyIds = recentBookings
-      .map((booking: any) => booking.propertyId?._id)
-      .filter((id: any) => id);
+      .map((booking: any) => {
+        const propertyId = booking.propertyId?._id || booking.propertyId;
+        return propertyId ? propertyId.toString() : null;
+      })
+      .filter((id: string | null): id is string => id !== null);
 
     const uniquePropertyIds = [...new Set(propertyIds)].slice(0, 3);
 
-    const properties = await Property.find({
-      _id: { $in: uniquePropertyIds },
-      isAvailable: true
-    }).limit(3).lean();
+    let properties;
+
+    // Si on a des réservations, utiliser ces propriétés
+    if (uniquePropertyIds.length > 0) {
+      properties = await Property.find({
+        _id: { $in: uniquePropertyIds },
+        isAvailable: true
+      }).limit(3).lean();
+
+      // Si on n'a pas trouvé assez de propriétés disponibles dans les réservations
+      // Compléter avec les dernières propriétés disponibles
+      if (properties.length < 3) {
+        const remainingCount = 3 - properties.length;
+        const existingIds = properties.map((p: any) => p._id.toString());
+        
+        const additionalProperties = await Property.find({
+          _id: { $nin: existingIds },
+          isAvailable: true
+        })
+          .sort({ createdAt: -1 })
+          .limit(remainingCount)
+          .lean();
+        
+        properties = [...properties, ...additionalProperties];
+      }
+    } else {
+      // Si pas de réservations, afficher les dernières propriétés disponibles
+      properties = await Property.find({
+        isAvailable: true
+      })
+        .sort({ createdAt: -1 })
+        .limit(3)
+        .lean();
+    }
 
     return properties.map((prop: any) => ({
       _id: prop._id.toString(),
@@ -62,6 +96,7 @@ async function getFeaturedProperties(): Promise<PropertyType[]> {
     }));
   } catch (error) {
     console.error('Erreur getFeaturedProperties:', error);
+    // En cas d'erreur, retourner un tableau vide mais on affichera un message plus clair
     return [];
   }
 }
@@ -189,9 +224,17 @@ export default async function Home() {
           </h2>
 
           {featuredProperties.length === 0 ? (
-            <p className="text-red-500" data-testid="text-no-featured">
-              Une erreur est survenue lors du chargement des propriétés.
-            </p>
+            <div className="text-center py-12">
+              <p className="text-gray-600 mb-4" data-testid="text-no-featured">
+                Aucun hébergement disponible pour le moment.
+              </p>
+              <Button variant="outline" asChild>
+                <Link href="/properties">
+                  Voir tous les hébergements
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredProperties.map((property) => (
@@ -257,7 +300,7 @@ export default async function Home() {
                   </Link>
                 </Button>
                 <Button className="bg-[#FF8C00] hover:bg-[#e67e00] text-white w-full sm:w-auto" asChild data-testid="button-become-owner">
-                  <Link href="/owner/register">
+                  <Link href="/host/register">
                     Devenir propriétaire
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -319,8 +362,10 @@ export default async function Home() {
           </div>
 
           <div className="text-center">
-            <Button variant="outline" data-testid="button-all-reviews">
-              Voir tous les avis
+            <Button variant="outline" data-testid="button-all-reviews" asChild>
+              <Link href="/reviews">
+                Voir tous les avis
+              </Link>
             </Button>
           </div>
         </div>

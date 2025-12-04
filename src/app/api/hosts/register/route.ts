@@ -18,6 +18,15 @@ const hostRegistrationSchema = z.object({
 // POST /api/hosts/register - Inscription directe d'un hôte
 export async function POST(request: NextRequest) {
   try {
+    // Vérifier les variables d'environnement critiques
+    if (!process.env.MONGODB_URI) {
+      console.error('❌ MONGODB_URI est manquante');
+      return NextResponse.json(
+        { message: 'Configuration serveur invalide' },
+        { status: 500 }
+      );
+    }
+
     await dbConnect();
     
     const body = await request.json();
@@ -79,7 +88,7 @@ export async function POST(request: NextRequest) {
       message: 'Inscription en tant que propriétaire réussie',
       user: userResponse
     }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { message: 'Données invalides', errors: error.errors },
@@ -88,8 +97,27 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Erreur lors de l\'inscription d\'un hôte:', error);
+    console.error('Stack trace:', error?.stack);
+    console.error('Error message:', error?.message);
+    console.error('Error name:', error?.name);
+    
+    // Log environment variables status (without values)
+    console.error('Environment check:', {
+      hasMongodbUri: !!process.env.MONGODB_URI,
+      hasJwtSecret: !!process.env.JWT_SECRET,
+      nodeEnv: process.env.NODE_ENV
+    });
+
+    // Return more details in development, generic message in production
+    const isDevelopment = process.env.NODE_ENV === 'development';
     return NextResponse.json(
-      { message: 'Erreur lors de l\'inscription d\'un hôte' },
+      { 
+        message: 'Erreur lors de l\'inscription d\'un hôte',
+        ...(isDevelopment && {
+          details: error?.message,
+          stack: error?.stack
+        })
+      },
       { status: 500 }
     );
   }

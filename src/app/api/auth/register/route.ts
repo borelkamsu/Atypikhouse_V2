@@ -5,6 +5,23 @@ import { generateToken } from '@/lib/auth/jwt';
 
 export async function POST(request: NextRequest) {
   try {
+    // Vérifier les variables d'environnement critiques
+    if (!process.env.MONGODB_URI) {
+      console.error('❌ MONGODB_URI est manquante');
+      return NextResponse.json(
+        { error: 'Configuration serveur invalide' },
+        { status: 500 }
+      );
+    }
+
+    if (!process.env.JWT_SECRET) {
+      console.error('❌ JWT_SECRET est manquant');
+      return NextResponse.json(
+        { error: 'Configuration serveur invalide' },
+        { status: 500 }
+      );
+    }
+
     await dbConnect();
 
     const body = await request.json();
@@ -73,8 +90,27 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Erreur lors de l\'inscription:', error);
+    console.error('Stack trace:', error?.stack);
+    console.error('Error message:', error?.message);
+    console.error('Error name:', error?.name);
+    
+    // Log environment variables status (without values)
+    console.error('Environment check:', {
+      hasMongodbUri: !!process.env.MONGODB_URI,
+      hasJwtSecret: !!process.env.JWT_SECRET,
+      nodeEnv: process.env.NODE_ENV
+    });
+
+    // Return more details in development, generic message in production
+    const isDevelopment = process.env.NODE_ENV === 'development';
     return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
+      { 
+        error: 'Erreur interne du serveur',
+        ...(isDevelopment && {
+          details: error?.message,
+          stack: error?.stack
+        })
+      },
       { status: 500 }
     );
   }

@@ -25,18 +25,29 @@ async function dbConnect() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      serverSelectionTimeoutMS: 10000, // 10 secondes timeout
+      socketTimeoutMS: 45000, // 45 secondes socket timeout
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose.connect(MONGODB_URI, opts)
+      .then((mongoose) => {
+        console.log('✅ Connexion MongoDB réussie');
+        return mongoose;
+      })
+      .catch((error) => {
+        console.error('❌ Erreur de connexion MongoDB:', error.message);
+        console.error('MONGODB_URI configuré:', MONGODB_URI ? 'Oui' : 'Non');
+        cached.promise = null;
+        throw error;
+      });
   }
 
   try {
     cached.conn = await cached.promise;
-  } catch (e) {
+  } catch (e: any) {
     cached.promise = null;
-    throw e;
+    console.error('❌ Échec de la connexion MongoDB:', e?.message);
+    throw new Error(`Erreur de connexion à la base de données: ${e?.message}`);
   }
 
   return cached.conn;
